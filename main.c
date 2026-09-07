@@ -7,13 +7,15 @@
 
 #define F_CPU 4915200UL		// processor speed 4.915 MHz
 #include "uart.h"
+#include "sram_test.h"
 #include <avr/io.h>
 #include <util/delay.h>
 
 int main(void)
 {
-	 uart_init(31);
-	 
-	printf("test test");
+    uart_init(31);
+	SRAM_init(); 
+	SRAM_test(); 
+	
 }
 

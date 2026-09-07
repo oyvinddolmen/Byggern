@@ -4,5 +4,7 @@
 
 main.c
 
+sram_test.c
+
 uart.c
 
