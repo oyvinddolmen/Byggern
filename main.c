@@ -13,10 +13,7 @@
 int main(void)
 {
 	 uart_init(31);
-
-	 while (1)
-	 {
-		 uart_send('a');
-	 }
+	 
+	printf("test test");
 }
 
