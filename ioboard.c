@@ -122,7 +122,25 @@ void print_touch_position(uint8_t x, uint8_t y)
 }
 
 
-void read_joystick()
-{
-    
+void adc_read_all(uint8_t channels[4]){
+
+    volatile char *adc = (char *) 0x1400; // Start address for the ADC
+    *adc = 0x00; // Select ADC channel 0 (X joystick)
+
+    channels[0] = *adc; // Read ADC value for X joystick
+    channels[1] = *adc; // Read ADC value for Y joystick
+    channels[2] = *adc; // Read ADC value for X touch
+    channels[3] = *adc; // Read ADC value for Y touch
+}
+
+void adc_print_all(uint8_t channels[4]){
+    printf("ADC values: X joystick=%3d, Y joystick=%3d, X touch=%3d, Y touch=%3d\n",
+           channels[0], channels[1], channels[2], channels[3]);
+    print("Joystick position: X=%3d%%, Y=%3d%%\n", joystick_position(channels[0], channels[1]).x, joystick_position(channels[0], channels[1]).y);
+    print("Touch position: X=%3d%%, Y=%3d%%\n", touch_position(channels[2], channels[3]).x, touch_position(channels[2], channels[3]).y);
+    print("Joystick direction: LEFT=%d, RIGHT=%d, UP=%d, DOWN=%d\n",
+          joystick_direction(channels[0], channels[1]).LEFT,
+          joystick_direction(channels[0], channels[1]).RIGHT,
+          joystick_direction(channels[0], channels[1]).UP,
+          joystick_direction(channels[0], channels[1]).DOWN);
 }
