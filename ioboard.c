@@ -108,3 +108,21 @@ Position touch_position(uint8_t x, uint8_t y)
 
     return position;
 }
+
+
+void print_joystick_position(uint8_t x, uint8_t y)
+{
+    Position pos = joystick_position(x, y);
+    printf("Joystick position: X=%3d%%, Y=%3d%%\n", pos.x, pos.y);
+}
+void print_touch_position(uint8_t x, uint8_t y)
+{
+    Position pos = touch_position(x, y);
+    printf("Touch position: X=%3d%%, Y=%3d%%\n", pos.x, pos.y);
+}
+
+
+void read_joystick()
+{
+    
+}
