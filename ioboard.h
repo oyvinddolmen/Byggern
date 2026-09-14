@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 typedef struct {
     bool LEFT;
@@ -22,7 +23,7 @@ typedef enum {
     Y_touch = 3
 } Variable;
 
-void ioboard_init(uint8_t joystick_x_0, uint8_t joystick_y_0);
+void ioboard_init();
 
 void auto_calibrate_joystick(uint8_t x, uint8_t y);
 void auto_calibrate_touch(uint8_t x, uint8_t y);
@@ -35,3 +36,6 @@ void print_joystick_position(uint8_t x, uint8_t y);
 void print_touch_position(uint8_t x, uint8_t y);
 
 void read_joystick();
+
+void adc_read_all(uint8_t channels[4]);
+void adc_print_all(uint8_t channels[4]);
