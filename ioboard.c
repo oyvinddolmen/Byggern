@@ -1,65 +1,110 @@
-#include <avr/io.h>
 #include "ioboard.h"
 
-void ioboard_init(float joystick_x_0, float joystick_y_0){
-    // Initialize the joystick and touch positions
-    JOYSTICK_X_0 = joystick_x_0;
-    JOYSTICK_Y_0 = joystick_y_0;
-}
+// Dead zone measured in ADC counts. Adjust as needed.
+#define JOYSTICK_DEADZONE 4
 
-void auto_calibrate_joystick(float x, float y) {
-    // Implement auto-calibration logic for the joystick here
-    if (x < JOYSTICK_X_NEGATIVE) {
-        JOYSTICK_X_NEGATIVE = x;
-    } else if (x > JOYSTICK_X_POSITIVE) {
-        JOYSTICK_X_POSITIVE = x;
-    }
-    if (y < JOYSTICK_Y_NEGATIVE) {
-        JOYSTICK_Y_NEGATIVE = y;
-    } else if (y > JOYSTICK_Y_POSITIVE) {
-        JOYSTICK_Y_POSITIVE = y;
-    }
-}
+typedef struct {
+    uint8_t min;
+    uint8_t max;
+} AxisRange;
 
-void auto_calibrate_touch(float x, float y) {
-    // Implement auto-calibration logic for the touch here
-    if (x < touch_x_negative) {
-        touch_x_negative = x;
-    }else if (x > touch_x_positive) {
-        touch_x_positive = x;
+static uint8_t joystick_x_center;
+static uint8_t joystick_y_center;
+
+static AxisRange joystick_x_range = {UINT8_MAX, 0};
+static AxisRange joystick_y_range = {UINT8_MAX, 0};
+static AxisRange touch_x_range = {UINT8_MAX, 0};
+static AxisRange touch_y_range = {UINT8_MAX, 0};
+
+static void update_range(AxisRange *range, uint8_t value)
+{
+    // Separate checks let the first sample set both endpoints.
+    if (value < range->min) {
+        range->min = value;
     }
-    if (y < touch_y_negative) {
-        touch_y_negative = y;
-    }else if (y > touch_y_positive) {
-        touch_y_positive = y;
+
+    if (value > range->max) {
+        range->max = value;
     }
 }
 
-JoystickDirections joystick_direction(float x, float y) {
-    JoystickDirections direction = {false, false, false, false};
-    if (x  < JOYSTICK_X_0){
-        direction.LEFT = true;
-    } else if (x > JOYSTICK_X_0) {
-        direction.RIGHT = true;
+static uint8_t position_percent(uint8_t value, AxisRange range)
+{
+    // No usable calibration yet.
+    if (range.max <= range.min) {
+        return 0;
     }
-    if (y < JOYSTICK_Y_0) {
-        direction.UP = true;
-    } else if (y > JOYSTICK_Y_0) {
-        direction.DOWN = true;
+
+    if (value <= range.min) {
+        return 0;
     }
+
+    if (value >= range.max) {
+        return 100;
+    }
+
+    return (uint8_t)(
+        ((uint16_t)(value - range.min) * 100u)
+        / (range.max - range.min)
+    );
+}
+
+void ioboard_init(uint8_t joystick_x_0, uint8_t joystick_y_0)
+{
+    joystick_x_center = joystick_x_0;
+    joystick_y_center = joystick_y_0;
+
+    joystick_x_range = (AxisRange){joystick_x_0, joystick_x_0};
+    joystick_y_range = (AxisRange){joystick_y_0, joystick_y_0};
+
+    touch_x_range = (AxisRange){UINT8_MAX, 0};
+    touch_y_range = (AxisRange){UINT8_MAX, 0};
+}
+
+void auto_calibrate_joystick(uint8_t x, uint8_t y)
+{
+    update_range(&joystick_x_range, x);
+    update_range(&joystick_y_range, y);
+}
+
+void auto_calibrate_touch(uint8_t x, uint8_t y)
+{
+    update_range(&touch_x_range, x);
+    update_range(&touch_y_range, y);
+}
+
+JoystickDirections joystick_direction(uint8_t x, uint8_t y)
+{
+    // Signed differences allow negative displacement.
+    int16_t dx = (int16_t)x - joystick_x_center;
+    int16_t dy = (int16_t)y - joystick_y_center;
+
+    JoystickDirections direction = {
+        .LEFT  = dx < -JOYSTICK_DEADZONE,
+        .RIGHT = dx >  JOYSTICK_DEADZONE,
+        .UP    = dy < -JOYSTICK_DEADZONE,
+        .DOWN  = dy >  JOYSTICK_DEADZONE
+    };
+
     return direction;
 }
 
-Position joystick_position(float x, float y) {
-    Position position = {0, 0};
-    position.x = (int)((x - JOYSTICK_X_NEGATIVE) / (JOYSTICK_X_POSITIVE - JOYSTICK_X_NEGATIVE) * 100);
-    position.y = (int)((y - JOYSTICK_Y_NEGATIVE) / (JOYSTICK_Y_POSITIVE - JOYSTICK_Y_NEGATIVE) * 100);
+Position joystick_position(uint8_t x, uint8_t y)
+{
+    Position position = {
+        .x = position_percent(x, joystick_x_range),
+        .y = position_percent(y, joystick_y_range)
+    };
+
     return position;
 }
 
-Position touch_position(float x, float y) {
-    Position position = {0, 0};
-    position.x = (int)((x - TOUCH_X_NEGATIVE) / (TOUCH_X_POSITIVE - TOUCH_X_NEGATIVE) * 100);
-    position.y = (int)((y - TOUCH_Y_NEGATIVE) / (TOUCH_Y_POSITIVE - TOUCH_Y_NEGATIVE) * 100);
+Position touch_position(uint8_t x, uint8_t y)
+{
+    Position position = {
+        .x = position_percent(x, touch_x_range),
+        .y = position_percent(y, touch_y_range)
+    };
+
     return position;
 }

@@ -1,41 +1,25 @@
-#include <avr/io.h>
+#define IOBOARD_H
+
 #include <stdbool.h>
-
-//measured values for the joystick
-float JOYSTICK_X_NEGATIVE = 1.25;
-float JOYSTICK_X_POSITIVE = 4.0;
-float JOYSTICK_X_0 = 2.55;
-float JOYSTICK_Y_NEGATIVE = 1.25;
-float JOYSTICK_Y_POSITIVE = 4.0;
-float JOYSTICK_Y_0 = 2.55;
-
-//measured touch values
-float TOUCH_X_NEGATIVE = 0.0;
-float TOUCH_X_POSITIVE = 2.5;
-
-float TOUCH_Y_NEGATIVE = 0.0;
-float TOUCH_Y_POSITIVE = 2.5;
-
+#include <stdint.h>
 
 typedef struct {
-    bool LEFT,
-    bool RIGHT,
-    bool UP,
-    bool DOWN
+    bool LEFT;
+    bool RIGHT;
+    bool UP;
+    bool DOWN;
 } JoystickDirections;
 
 typedef struct {
-    int x;
-    int y;
+    uint8_t x;
+    uint8_t y;
 } Position;
 
-void ioboard_init(void) {};
+void ioboard_init(uint8_t joystick_x_0, uint8_t joystick_y_0);
 
-void auto_calibrate_joystick();
-void auto_calibrate_touch();
+void auto_calibrate_joystick(uint8_t x, uint8_t y);
+void auto_calibrate_touch(uint8_t x, uint8_t y);
 
-JoystickDirections joystick_direction{};
-
-Position joystick_position{};
-Position touch_position{};
-
+JoystickDirections joystick_direction(uint8_t x, uint8_t y);
+Position joystick_position(uint8_t x, uint8_t y);
+Position touch_position(uint8_t x, uint8_t y);
