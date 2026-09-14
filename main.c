@@ -10,12 +10,15 @@
 #include "sram_test.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include "clock.h"
 
 int main(void)
 {
     uart_init(31);
 	SRAM_init(); 
-	SRAM_test(); 
-	
+	clock_init();
+
+	while(1){
+	}
 }
 
