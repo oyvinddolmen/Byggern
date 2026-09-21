@@ -23,13 +23,17 @@ int main(void)
 
 	uint8_t channels[4];
 
-	while(1) {
+	spi_init();
+    oled_init();
 
+    // Start at PAGE0, column 0
+    oled_pos(0, 0);
 
-		spi_init();
-		uint8_t data = spi_transfer_byte(0xAA, DISPLAY);
+    // Test text
+    oled_print("HELLO");
 
-		_delay_ms(50); //Bare sånn at det ikke blir helt kaos i putty
-	}
+    while (1)
+    {
+    }
 }
 
