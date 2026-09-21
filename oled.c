@@ -22,9 +22,7 @@ void oled_init(void)
     oled_write_command(0x20); //Set Memory Addressing Mode
     oled_write_command(0x02); //As page adressing mode
     oled_write_command(0xdb); //VCOM deselect level mode
-    oled_write_command(0x30);
-    oled_write_command(0xad); //master configuration
-    oled_write_command(0x00);
+    oled_write_command(0x34);
     oled_write_command(0xa4); //out follows RAM content
     oled_write_command(0xa6); //set normal display
     oled_write_command(0xaf); // display on
@@ -35,6 +33,7 @@ void oled_reset(void)
     PORTB &= ~(1 << PB2); // Set RESET LOW
     _delay_ms(10);        // Wait for 10 ms
     PORTB |= (1 << PB2);  // Set RESET HIGH
+    oled_clear();
 }
 
 void oled_home(void)
@@ -44,17 +43,17 @@ void oled_home(void)
 
 void oled_write_command(uint8_t command)
 {
-    PORTB &= ~(1 << PB3);    // D/C# = 1: command
+    PORTB &= ~(1 << PB3);    // D/C# = 0: command
     spi_slave_select(DISPLAY); // Select the appropriate slave
-    spi_transfer_byte(command, DISPLAY);
+    spi_transfer_byte(command);
     spi_slave_select(NONE); 
 }
 
 void oled_write_data(uint8_t data)
 {
-    PORTB |= (1 << PB3);     // D/C# = 0: display data
+    PORTB |= (1 << PB3);     // D/C# = 1: data
     spi_slave_select(DISPLAY); // Select the appropriate slave
-    spi_transfer_byte(data, DISPLAY);
+    spi_transfer_byte(data);
     spi_slave_select(NONE);
 }
 

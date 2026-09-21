@@ -67,7 +67,7 @@ void spi_slave_select(Slave slave)
     }
 }
 
-uint8_t spi_transfer_byte(uint8_t data, Slave slave)
+uint8_t spi_transfer_byte(uint8_t data)
 {
     SPDR = data; // Load data into the SPI Data Register
     while (!(SPSR & (1 << SPIF))); // Wait for transmission to complete

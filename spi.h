@@ -9,5 +9,5 @@ typedef enum {
 } Slave;
 
 void spi_slave_select(Slave slave);
-uint8_t spi_transfer_byte(uint8_t data, Slave slave);
+uint8_t spi_transfer_byte(uint8_t data);
 void spi_init(void);
