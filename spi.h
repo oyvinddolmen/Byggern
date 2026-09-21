@@ -7,4 +7,5 @@ typedef enum {
     CAN = 2
 } Slave;
 
-slave_select(Slave slave);
+void slave_select(Slave slave);
+
