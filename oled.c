@@ -1,5 +1,6 @@
 #include "oled.h"
 #include "spi.h"
+#include "fonts.h"
 
 
 void oled_init(void)
@@ -43,27 +44,23 @@ void oled_home(void)
 
 void oled_write_command(uint8_t command)
 {
-    PORTB &= ~(1 << PB3);    // D/C# = 0: command
-    slave_select(DISPLAY);   // OLED CS = 0
-
-    spi_transfer_byte(command);
-
-    slave_select(NONE); 
+    PORTB &= ~(1 << PB3);    // D/C# = 1: command
+    spi_slave_select(DISPLAY); // Select the appropriate slave
+    spi_transfer_byte(command, DISPLAY);
+    spi_slave_select(NONE); 
 }
 
 void oled_write_data(uint8_t data)
 {
-    PORTB |= (1 << PB3);     // D/C# = 1: display data
-    slave_select(DISPLAY);
-
-    spi_transfer_byte(data);
-
-    slave_select(NONE);
+    PORTB |= (1 << PB3);     // D/C# = 0: display data
+    spi_slave_select(DISPLAY); // Select the appropriate slave
+    spi_transfer_byte(data, DISPLAY);
+    spi_slave_select(NONE);
 }
 
 void oled_goto_line(uint8_t line)
 {
-    if line > 7 {
+    if (line > 7) {
         return; // Invalid line number
     }
     oled_write_command(0xB0 | line); // Set page address
@@ -71,7 +68,7 @@ void oled_goto_line(uint8_t line)
 
 void oled_goto_column(uint8_t column)
 {
-    if column > 127 {
+    if (column > 127) {
         return; // Invalid column number
     }
      // Bits 0–3 of the column address
@@ -100,7 +97,7 @@ void oled_clear_line(uint8_t line)
     }
 }
 
-void oled_clear(void)
+void oled_clear()
 {
     for (uint8_t line = 0; line < 8; line++)
     {
@@ -117,10 +114,44 @@ void oled_pos(uint8_t row, uint8_t column)
     oled_goto_column(column);
 }
 
-void oled_print(char *str)
+void oled_write_char(char c)
 {
-    while (*str) {
-        // Send character to OLED
-        str++;
+    // Font table contains printable ASCII characters:
+    // ASCII 32 (' ') to ASCII 126 ('~')
+    if (c < 32 || c > 126)
+    {
+        c = '?';
+    }
+
+    // Convert ASCII code to font table index.
+    // Example:
+    // ' ' = ASCII 32 -> index 0
+    // 'A' = ASCII 65 -> index 33
+    uint8_t index = c - 32;
+
+    // font5 contains 5 columns for each character
+    for (uint8_t column = 0; column < 5; column++)
+    {
+        // Font is stored in Flash/PROGMEM,
+        // so we must use pgm_read_byte()
+        uint8_t data =
+            pgm_read_byte(&font5[index][column]);
+
+        // Send one vertical column of pixels
+        oled_write_data(data);
+    }
+
+    // Add one blank column between characters
+    oled_write_data(0x00);
+}
+
+void oled_print(const char *text)
+{
+    while (*text != '\0')
+    {
+        oled_write_char(*text);
+
+        // Move pointer to next character
+        text++;
     }
 }

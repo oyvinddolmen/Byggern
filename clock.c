@@ -1,5 +1,6 @@
 #include <avr/io.h>
 
+// klokkesignal for ADCen
 void clock_init(void)
 {
     DDRD |= (1 << PD4);          // PD4/OC3A as output
