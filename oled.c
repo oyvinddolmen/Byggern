@@ -19,7 +19,7 @@ void oled_init(void)
     oled_write_command(0xd9); //set pre-charge period
     oled_write_command(0x21);
     oled_write_command(0x20); //Set Memory Addressing Mode
-    oled_write_command(0x02);
+    oled_write_command(0x02); //As page adressing mode
     oled_write_command(0xdb); //VCOM deselect level mode
     oled_write_command(0x30);
     oled_write_command(0xad); //master configuration
@@ -48,12 +48,12 @@ void oled_write_command(uint8_t command)
 
     spi_transfer_byte(command);
 
-    slave_select(NONE);  // OLED CS = 1
+    slave_select(NONE); 
 }
 
 void oled_write_data(uint8_t data)
 {
-    PORTB |= (1 << PB3);     // D/C = 1: display data
+    PORTB |= (1 << PB3);     // D/C# = 1: display data
     slave_select(DISPLAY);
 
     spi_transfer_byte(data);
