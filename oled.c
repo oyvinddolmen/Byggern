@@ -63,21 +63,21 @@ void oled_write_data(uint8_t data)
 
 void oled_goto_line(uint8_t line)
 {
-    if (line > 7)
-        return;
-
-    oled_write_command(0xB0 + line);
+    if line > 7 {
+        return; // Invalid line number
+    }
+    oled_write_command(0xB0 | line); // Set page address
 }
 
 void oled_goto_column(uint8_t column)
 {
-    if (column >= 128)
-        return;
-
-    // Lower 4 bits
+    if column > 127 {
+        return; // Invalid column number
+    }
+     // Bits 0–3 of the column address
     oled_write_command(0x00 | (column & 0x0F));
 
-    // Upper 4 bits
+    // Bits 4–7 of the column address
     oled_write_command(0x10 | ((column >> 4) & 0x0F));
 }
 
