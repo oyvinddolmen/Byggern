@@ -152,3 +152,47 @@ void adc_print_all(uint8_t channels[4]){
           joystick_direction(channels[0], channels[1]).UP,
           joystick_direction(channels[0], channels[1]).DOWN);
 }
+
+JoystickData poll_joystick_data() {
+    JoystickData data;
+    slave_select(IOBOARD);
+
+    spi_transfer_byte(0x03);
+
+    /* Required delay after command byte */
+    _delay_us(40);
+
+    joystick.x = read_byte();
+
+    _delay_us(2);
+    joystick.y = read_byte();
+
+    _delay_us(2);
+    joystick.button = read_byte();
+
+    slave_deselect_all();
+
+    return joystick;
+}
+
+JoystickInput read_joystick() {
+    volatile char *adc = (char *) 0x1400; // Start address for the ADC
+    *adc = 0x00; // Select ADC channel 0 (X joystick)
+
+    uint8_t x = *adc; // Read ADC value for X joystick
+    uint8_t y = *adc; // Read ADC value for Y joystick
+
+    JoystickDirections direction = joystick_direction(x, y);
+
+    if (direction.UP) {
+        return UP;
+    } else if (direction.DOWN) {
+        return DOWN;
+    } else if (direction.LEFT) {
+        return LEFT;
+    } else if (direction.RIGHT) {
+        return RIGHT;
+    } else {
+        return NONE;
+    }
+}
