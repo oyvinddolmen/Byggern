@@ -45,7 +45,7 @@ void spi_init(void)
          | (1 << SPR0);
 }
 
-void slave_select(Slave slave)
+void spi_slave_select(Slave slave)
 {
     // Deselect all slaves
     PORTB |= (1 << PB4) | (1 << PB1) | (1 << PB0);
@@ -69,7 +69,7 @@ void slave_select(Slave slave)
 
 uint8_t spi_transfer_byte(uint8_t data, Slave slave)
 {
-    slave_select(slave); // Select the appropriate slave
+    spi_slave_select(slave); // Select the appropriate slave
     SPDR = data; // Load data into the SPI Data Register
     while (!(SPSR & (1 << SPIF))); // Wait for transmission to complete
 
