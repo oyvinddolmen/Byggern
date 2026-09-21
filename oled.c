@@ -20,7 +20,7 @@ void oled_init(void)
     oled_write_command(0xd9); //set pre-charge period
     oled_write_command(0x21);
     oled_write_command(0x20); //Set Memory Addressing Mode
-    oled_write_command(0x02);   //Page adressing mode
+    oled_write_command(0x02); //As page adressing mode
     oled_write_command(0xdb); //VCOM deselect level mode
     oled_write_command(0x30);
     oled_write_command(0xad); //master configuration
@@ -49,12 +49,12 @@ void oled_write_command(uint8_t command)
 
     spi_transfer_byte(command);
 
-    slave_select(NONE);  // OLED CS = 1
+    slave_select(NONE); 
 }
 
 void oled_write_data(uint8_t data)
 {
-    PORTB |= (1 << PB3);     // D/C = 1: display data
+    PORTB |= (1 << PB3);     // D/C# = 1: display data
     slave_select(DISPLAY);
 
     spi_transfer_byte(data);
@@ -85,7 +85,31 @@ void oled_goto_column(uint8_t column)
 
 void oled_clear_line(uint8_t line)
 {
-    // ...
+    if (line > 7)
+    {
+        return;
+    }
+
+    // Start at beginning of requested page
+    oled_goto_line(line);
+    oled_goto_column(0);
+
+    // One byte for each of the 128 columns
+    for (uint8_t column = 0; column < 128; column++)
+    {
+        oled_write_data(0x00);
+    }
+}
+
+void oled_clear(void)
+{
+    for (uint8_t line = 0; line < 8; line++)
+    {
+        oled_clear_line(line);
+    }
+
+    // Put the RAM pointer back at top-left
+    oled_pos(0,0);
 }
 
 void oled_pos(uint8_t row, uint8_t column)
