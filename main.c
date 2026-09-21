@@ -12,6 +12,7 @@
 #include <util/delay.h>
 #include "clock.h"
 #include "ioboard.h"
+#include "spi.h"
 
 int main(void)
 {
@@ -25,8 +26,8 @@ int main(void)
 	while(1) {
 
 
-		adc_read_all(channels);
-		adc_print_all(channels);
+		spi_init();
+		spi_transfer_byte(0xAA, DISPLAY);
 
 		_delay_ms(50); //Bare sånn at det ikke blir helt kaos i putty
 	}

@@ -7,6 +7,6 @@ typedef enum {
     CAN = 2
 } Slave;
 
-void slave_select(Slave slave);
-uint8_t transfer_byte(uint8_t data, Slave slave);
+void spi_slave_select(Slave slave);
+uint8_t spi_transfer_byte(uint8_t data, Slave slave);
 void spi_init(void);
