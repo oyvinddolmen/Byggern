@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 typedef enum {
+    NONE = -1,
     DISPLAY = 0,
     IOBOARD = 1,
     CAN = 2
