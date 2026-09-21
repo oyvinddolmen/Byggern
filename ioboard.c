@@ -1,3 +1,7 @@
+#ifndef F_CPU
+#define F_CPU 4915200UL
+#endif
+#include <util/delay.h>
 #include "ioboard.h"
 
 // Dead zone measured in ADC counts. Adjust as needed.
@@ -10,6 +14,10 @@ typedef struct {
 
 static uint8_t joystick_x_center;
 static uint8_t joystick_y_center;
+static JoystickInput candidate = JOYSTICK_NONE;
+static JoystickInput stable = JOYSTICK_NONE;
+static uint8_t stable_samples;
+static bool direction_armed = true;
 
 static AxisRange joystick_x_range = {UINT8_MAX, 0};
 static AxisRange joystick_y_range = {UINT8_MAX, 0};
@@ -49,12 +57,17 @@ static uint8_t position_percent(uint8_t value, AxisRange range)
     );
 }
 
-void ioboard_init()
-{   volatile char *adc = (char *) 0x1400; // Start address for the ADC
-    *adc = 0x00; // Select ADC channel 0 (X joystick)
-
-    uint8_t joystick_x_0 = *adc; // Read ADC value for X joystick
-    uint8_t joystick_y_0 = *adc; // Read ADC value for Y joystick
+void ioboard_init(void)
+{
+    /* Also supports existing main.c, which calls this before spi_init(). */
+    spi_init();
+    _delay_ms(100);
+    JoystickData center = joystick_read();
+    uint8_t joystick_x_0 = center.x;
+    uint8_t joystick_y_0 = center.y;
+    candidate = stable = JOYSTICK_NONE;
+    stable_samples = 0;
+    direction_armed = true;
     joystick_x_center = joystick_x_0;
     joystick_y_center = joystick_y_0;
 
@@ -86,8 +99,8 @@ JoystickDirections joystick_direction(uint8_t x, uint8_t y)
     JoystickDirections direction = {
         .LEFT  = dx < -JOYSTICK_DEADZONE,
         .RIGHT = dx >  JOYSTICK_DEADZONE,
-        .UP    = dy > -JOYSTICK_DEADZONE,
-        .DOWN  = dy <  JOYSTICK_DEADZONE
+        .UP    = dy >  JOYSTICK_DEADZONE,
+        .DOWN  = dy < -JOYSTICK_DEADZONE
     };
 
     return direction;
@@ -151,4 +164,67 @@ void adc_print_all(uint8_t channels[4]){
           joystick_direction(channels[0], channels[1]).RIGHT,
           joystick_direction(channels[0], channels[1]).UP,
           joystick_direction(channels[0], channels[1]).DOWN);
+}
+
+JoystickData joystick_read(void) {
+    JoystickData joystick;
+
+    spi_slave_select(IOBOARD);
+
+    // Joystick command
+    spi_transfer_byte(0x03, IOBOARD);
+
+    // Required delay between command and first result 
+    _delay_us(40);
+
+    joystick.x = spi_transfer_byte(0xFF, IOBOARD);
+
+    _delay_us(2);
+
+    joystick.y = spi_transfer_byte(0xFF, IOBOARD);
+
+    _delay_us(2);
+
+    joystick.btn = spi_transfer_byte(0xFF, IOBOARD);
+
+    spi_slave_select(NONE);
+
+    return joystick;
+}
+
+JoystickInput poll_joystick(void)
+{
+    JoystickData joystick = joystick_read();
+    JoystickDirections direction = joystick_direction(joystick.x, joystick.y);
+    JoystickInput raw = JOYSTICK_NONE;
+
+    /* SPI btn polarity: assumes nonzero means pressed; verify on hardware. */
+    if (joystick.btn != 0) raw = SELECT;
+    else if (direction.UP) raw = UP;
+    else if (direction.DOWN) raw = DOWN;
+    else if (direction.LEFT) raw = LEFT;
+    else if (direction.RIGHT) raw = RIGHT;
+
+    if (raw != candidate) {
+        candidate = raw;
+        stable_samples = 1;
+    } else if (stable_samples < 3) {
+        stable_samples++;
+    }
+    if (stable_samples < 3 || candidate == stable) return JOYSTICK_NONE;
+
+    stable = candidate;
+    if (stable == JOYSTICK_NONE) {
+        direction_armed = true;
+        return JOYSTICK_NONE;
+    }
+    if (stable == SELECT) {
+        direction_armed = false;
+        return SELECT;
+    }
+    if (direction_armed) {
+        direction_armed = false;
+        return stable;
+    }
+    return JOYSTICK_NONE;
 }
