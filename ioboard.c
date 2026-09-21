@@ -133,6 +133,8 @@ void adc_read_all(uint8_t channels[4]){
     volatile char *adc = (char *) 0x1400; // Start address for the ADC
     *adc = 0x00; // Select ADC channel 0 (X joystick)
 
+
+    //Henter neste kanal hver gang du henter read
     channels[0] = *adc; // Read ADC value for X joystick
     channels[1] = *adc; // Read ADC value for Y joystick
     channels[3] = *adc; // Read ADC value for X touch
