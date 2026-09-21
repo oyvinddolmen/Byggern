@@ -49,7 +49,7 @@ void spi_init(void)
 void slave_select(Slave slave)
 {
     // Deselect all slaves
-    PORTB |= (1 << PB2) | (1 << PB1) | (1 << PB0);
+    PORTB |= (1 << PB4) | (1 << PB1) | (1 << PB0);
 
 
     switch (slave) {
@@ -68,15 +68,11 @@ void slave_select(Slave slave)
     }
 }
 
-void write_byte(uint8_t data)
+uint8_t transfer_byte(uint8_t data, Slave slave)
 {
+    slave_select(slave); // Select the appropriate slave
     SPDR = data; // Load data into the SPI Data Register
     while (!(SPSR & (1 << SPIF))); // Wait for transmission to complete
-}
 
-uint8_t read_byte(void)
-{
-    SPDR = 0xFF; // Send dummy data to initiate SPI read
-    while (!(SPSR & (1 << SPIF))); // Wait for reception to complete
     return SPDR; // Return the received data
 }
