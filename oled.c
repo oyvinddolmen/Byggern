@@ -1,5 +1,6 @@
 #include "oled.h"
 #include "spi.h"
+#include "fonts.h"
 
 
 void oled_init(void)
@@ -122,5 +123,47 @@ void oled_print(char *str)
     while (*str) {
         // Send character to OLED
         str++;
+    }
+}
+
+void oled_write_char(char c)
+{
+    // Font table contains printable ASCII characters:
+    // ASCII 32 (' ') to ASCII 126 ('~')
+    if (c < 32 || c > 126)
+    {
+        c = '?';
+    }
+
+    // Convert ASCII code to font table index.
+    // Example:
+    // ' ' = ASCII 32 -> index 0
+    // 'A' = ASCII 65 -> index 33
+    uint8_t index = c - 32;
+
+    // font5 contains 5 columns for each character
+    for (uint8_t column = 0; column < 5; column++)
+    {
+        // Font is stored in Flash/PROGMEM,
+        // so we must use pgm_read_byte()
+        uint8_t data =
+            pgm_read_byte(&font5[index][column]);
+
+        // Send one vertical column of pixels
+        oled_write_data(data);
+    }
+
+    // Add one blank column between characters
+    oled_write_data(0x00);
+}
+
+void oled_print(const char *text)
+{
+    while (*text != '\0')
+    {
+        oled_write_char(*text);
+
+        // Move pointer to next character
+        text++;
     }
 }
