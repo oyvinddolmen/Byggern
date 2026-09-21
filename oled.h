@@ -4,8 +4,8 @@
 oled_init();
 oled_reset();
 oled_home();
-oled_goto_line(line);
-oled_goto_column(column);
-oled_clear_line(line);
-oled_pos(row,column);
-oled_print(char*);
+oled_goto_line(uint8_t line);
+oled_goto_column(uint8_t column);
+oled_clear_line(uint8_t line);
+oled_pos(uint8_t row, uint8_t column);
+oled_print(char* str);  
