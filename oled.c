@@ -84,7 +84,31 @@ void oled_goto_column(uint8_t column)
 
 void oled_clear_line(uint8_t line)
 {
-    // ...
+    if (line > 7)
+    {
+        return;
+    }
+
+    // Start at beginning of requested page
+    oled_goto_line(line);
+    oled_goto_column(0);
+
+    // One byte for each of the 128 columns
+    for (uint8_t column = 0; column < 128; column++)
+    {
+        oled_write_data(0x00);
+    }
+}
+
+void oled_clear(void)
+{
+    for (uint8_t line = 0; line < 8; line++)
+    {
+        oled_clear_line(line);
+    }
+
+    // Put the RAM pointer back at top-left
+    oled_pos(0,0);
 }
 
 void oled_pos(uint8_t row, uint8_t column)
