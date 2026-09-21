@@ -1,4 +1,5 @@
 #include "menu.h"
+#include <stddef.h>
 
 Menu main_menu;
 Menu difficulty_menu;
@@ -6,14 +7,10 @@ Menu difficulty_menu;
 Menu *current_menu = &main_menu;
 uint8_t selected_item_index = 0;
 
-void menu_init(void) {
-
-    
-
-    MenuItem difficulty_items[] = {
+static MenuItem difficulty_items[] = {
     {"Easy", MENU_ACTION, .action = set_easy},
     {"Hard", MENU_ACTION, .action = set_hard},
-    {"Back", MENU_BACK, .submenu = &main_menu}
+    {"Back", MENU_BACK, .submenu = NULL}
     };
 
     Menu difficulty_menu = {
@@ -25,7 +22,7 @@ void menu_init(void) {
 
     //Main
 
-    MenuItem main_items[] = {
+static MenuItem main_items[] = {
         {"Start Game", MENU_ACTION, .action = NULL}, // Placeholder
         {"Difficulty", MENU_SUBMENU, .submenu = &difficulty_menu},
         {"Exit", MENU_ACTION, .action = NULL} // Placeholder
@@ -38,11 +35,14 @@ void menu_init(void) {
         NULL
     };
 
+void menu_init(void)
+{
+    current_menu = &main_menu;
+    selected_item_index = 0;
 }
 
-
-
 void menu_next_item(void) {
+    if (!current_menu || !current_menu->item_count) return;
     selected_item_index++;
 
     if (selected_item_index >= current_menu->item_count) {
@@ -51,6 +51,7 @@ void menu_next_item(void) {
 }
 
 void menu_previous_item(void) {
+    if (!current_menu || !current_menu->item_count) return;
     if (selected_item_index == 0) {
         selected_item_index = current_menu->item_count - 1;
     } else {
@@ -59,6 +60,8 @@ void menu_previous_item(void) {
 }
 
 void menu_select(void) {
+    if (!current_menu || !current_menu->items ||
+        selected_item_index >= current_menu->item_count) return;
     MenuItem *selected_item = &current_menu->items[selected_item_index];
 
     switch (selected_item->type) {

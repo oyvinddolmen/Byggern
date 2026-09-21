@@ -1,17 +1,20 @@
+#ifndef F_CPU
+#define F_CPU 4915200UL
+#endif
+#include <util/delay.h>
 #include "run.h"
+#include "ioboard.h"
+#include "menu.h"
+#include "oled.h"
+#include "clock.h"
 
 void run_init(void)
 {
-    oled_init();
-    menu_init();
     clock_init();
 	ioboard_init();
-    spi_init();
-}
-
-JoystickInput poll_joystick(void)
-{
-    return read_joystick();
+    oled_reset();
+    oled_init();
+    menu_init();
 }
 
 void update_display(void)
@@ -33,8 +36,10 @@ void update_display(void)
 
 void run_menu(void)
 {
+    update_display();
     while (1) {
-        if (input = poll_joystick() != NONE) {
+        JoystickInput input = poll_joystick();
+        if (input != JOYSTICK_NONE) {
             switch (input) {
                 case UP:
                     menu_previous_item();
@@ -50,6 +55,6 @@ void run_menu(void)
             }
             update_display();
         }
-        sleep_ms(400); // Delay for human input, in ms
+        _delay_ms(10);
     }
 }

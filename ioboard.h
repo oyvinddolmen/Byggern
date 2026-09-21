@@ -1,3 +1,4 @@
+#ifndef IOBOARD_H
 #define IOBOARD_H
 
 #include <stdbool.h>
@@ -30,7 +31,7 @@ typedef enum {
     LEFT,
     RIGHT,
     SELECT,
-    NONE
+    JOYSTICK_NONE
 } JoystickInput;
 
 typedef struct {
@@ -40,7 +41,7 @@ typedef struct {
 } JoystickData;
 
 
-void ioboard_init();
+void ioboard_init(void);
 
 void auto_calibrate_joystick(uint8_t x, uint8_t y);
 void auto_calibrate_touch(uint8_t x, uint8_t y);
@@ -48,12 +49,15 @@ void auto_calibrate_touch(uint8_t x, uint8_t y);
 JoystickDirections joystick_direction(uint8_t x, uint8_t y);
 Position joystick_position(uint8_t x, uint8_t y);
 Position touch_position(uint8_t x, uint8_t y);
-JoystickData poll_joystick_data();
+JoystickData joystick_read(void);
 
 void print_joystick_position(uint8_t x, uint8_t y);
 void print_touch_position(uint8_t x, uint8_t y);
 
-JoystickInput read_joystick();
+/* Call about every 10 ms; three equal samples debounce transitions. */
+JoystickInput poll_joystick(void);
 
 void adc_read_all(uint8_t channels[4]);
 void adc_print_all(uint8_t channels[4]);
+
+#endif

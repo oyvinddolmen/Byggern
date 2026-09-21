@@ -2,6 +2,8 @@
 
 void spi_init(void)
 {
+    /* Inactive CS/reset before enabling outputs. */
+    PORTB |= (1 << PB4) | (1 << PB1) | (1 << PB0) | (1 << PB2);
     // Outputs:
     // PB7 = SCK
     // PB5 = MOSI
@@ -21,7 +23,7 @@ void spi_init(void)
     // PB6 = MISO input
     DDRB &= ~(1 << PB6);
 
-    // Hardware SS: keep HIGH
+    // Hardware SS/CAN CS: initially HIGH; must remain an output.
     PORTB |= (1 << PB4);
 
     // Deselect both SPI slaves
@@ -40,6 +42,7 @@ void spi_init(void)
     // Clock = F_CPU / 16
     // Mode 0: CPOL = 0, CPHA = 0
     // MSB first
+    SPSR &= ~(1 << SPI2X);
     SPCR = (1 << SPE)
          | (1 << MSTR)
          | (1 << SPR0);
@@ -69,6 +72,8 @@ void spi_slave_select(Slave slave)
 
 uint8_t spi_transfer_byte(uint8_t data, Slave slave)
 {
+    /* Keep compatibility; caller controls CS across the whole transaction. */
+    (void)slave;
     SPDR = data; // Load data into the SPI Data Register
     while (!(SPSR & (1 << SPIF))); // Wait for transmission to complete
 
