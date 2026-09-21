@@ -12,10 +12,10 @@ void slave_select(Slave slave)
             PORTB &= ~(1 << PB1); // Select display
             break;
         case IOBOARD:
-            PORTB &= ~(1 << PB4); // Select ioboard
+            PORTB &= ~(1 << PB0); // Select ioboard
             break;
         case CAN:
-            PORTB &= ~(1 << PB0); // Select CAN
+            PORTB &= ~(1 << PB4); // Select CAN
             break;
         default:
             // Invalid slave, do nothing
