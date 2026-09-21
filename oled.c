@@ -1,5 +1,6 @@
 #include "oled.h"
 #include "spi.h"
+#include "font.h"
 
 
 void oled_init(void)
