@@ -1,5 +1,4 @@
-#include <spi.h>
-#include <avr/io.h>
+#include "spi.h"
 
 void spi_init(void)
 {
@@ -68,7 +67,7 @@ void slave_select(Slave slave)
     }
 }
 
-uint8_t transfer_byte(uint8_t data, Slave slave)
+uint8_t spi_transfer_byte(uint8_t data, Slave slave)
 {
     slave_select(slave); // Select the appropriate slave
     SPDR = data; // Load data into the SPI Data Register

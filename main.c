@@ -27,7 +27,7 @@ int main(void)
 
 
 		spi_init();
-		spi_transfer_byte(0xAA, DISPLAY);
+		uint8_t data = spi_transfer_byte(0xAA, DISPLAY);
 
 		_delay_ms(50); //Bare sånn at det ikke blir helt kaos i putty
 	}

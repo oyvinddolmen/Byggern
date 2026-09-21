@@ -1,6 +1,7 @@
 #include "oled.h"
 #include "spi.h"
 
+
 void oled_init(void)
 {
     // OLED initialization
