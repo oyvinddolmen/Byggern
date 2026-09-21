@@ -72,8 +72,7 @@ void spi_slave_select(Slave slave)
 
 uint8_t spi_transfer_byte(uint8_t data)
 {
-    /* Keep compatibility; caller controls CS across the whole transaction. */
-    (void)slave;
+    
     SPDR = data; // Load data into the SPI Data Register
     while (!(SPSR & (1 << SPIF))); // Wait for transmission to complete
 

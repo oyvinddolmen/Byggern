@@ -172,20 +172,20 @@ JoystickData joystick_read(void) {
     spi_slave_select(IOBOARD);
 
     // Joystick command
-    spi_transfer_byte(0x03, IOBOARD);
+    spi_transfer_byte(0x03);
 
     // Required delay between command and first result 
     _delay_us(40);
 
-    joystick.x = spi_transfer_byte(0xFF, IOBOARD);
+    joystick.x = spi_transfer_byte(0xFF);
 
     _delay_us(2);
 
-    joystick.y = spi_transfer_byte(0xFF, IOBOARD);
+    joystick.y = spi_transfer_byte(0xFF);
 
     _delay_us(2);
 
-    joystick.btn = spi_transfer_byte(0xFF, IOBOARD);
+    joystick.btn = spi_transfer_byte(0xFF);
 
     spi_slave_select(NONE);
 

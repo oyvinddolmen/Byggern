@@ -8,6 +8,8 @@
 #include "ioboard.h"
 #include "spi.h"
 #include "oled.h"
+#include "menu.h"
+#include "run.h"
 
 int main() {
     uart_init(31);
@@ -22,11 +24,8 @@ int main() {
 	_delay_ms(10);
     oled_init();
 
-	
-    
-	oled_print("KUK");
-
-    
+	run_init();
+	run_menu();
 
     while (1){
 	}
