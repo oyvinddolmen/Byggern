@@ -44,27 +44,23 @@ void oled_home(void)
 
 void oled_write_command(uint8_t command)
 {
-    PORTB &= ~(1 << PB3);    // D/C# = 0: command
-    slave_select(DISPLAY);   // OLED CS = 0
-
-    spi_transfer_byte(command);
-
-    slave_select(NONE); 
+    PORTB &= ~(1 << PB3);    // D/C# = 1: command
+    spi_slave_select(DISPLAY); // Select the appropriate slave
+    spi_transfer_byte(command, DISPLAY);
+    spi_slave_select(NONE); 
 }
 
 void oled_write_data(uint8_t data)
 {
-    PORTB |= (1 << PB3);     // D/C# = 1: display data
-    slave_select(DISPLAY);
-
-    spi_transfer_byte(data);
-
-    slave_select(NONE);
+    PORTB |= (1 << PB3);     // D/C# = 0: display data
+    spi_slave_select(DISPLAY); // Select the appropriate slave
+    spi_transfer_byte(data, DISPLAY);
+    spi_slave_select(NONE);
 }
 
 void oled_goto_line(uint8_t line)
 {
-    if line > 7 {
+    if (line > 7) {
         return; // Invalid line number
     }
     oled_write_command(0xB0 | line); // Set page address
@@ -72,7 +68,7 @@ void oled_goto_line(uint8_t line)
 
 void oled_goto_column(uint8_t column)
 {
-    if column > 127 {
+    if (column > 127) {
         return; // Invalid column number
     }
      // Bits 0–3 of the column address
@@ -101,7 +97,7 @@ void oled_clear_line(uint8_t line)
     }
 }
 
-void oled_clear(void)
+void oled_clear()
 {
     for (uint8_t line = 0; line < 8; line++)
     {
@@ -116,14 +112,6 @@ void oled_pos(uint8_t row, uint8_t column)
 {
     oled_goto_line(row);
     oled_goto_column(column);
-}
-
-void oled_print(char *str)
-{
-    while (*str) {
-        // Send character to OLED
-        str++;
-    }
 }
 
 void oled_write_char(char c)

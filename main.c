@@ -13,9 +13,9 @@
 #include "clock.h"
 #include "ioboard.h"
 #include "spi.h"
+#include "oled.h"
 
-int main(void)
-{
+int main() {
     uart_init(31);
 	SRAM_init(); 
 	clock_init();
@@ -24,16 +24,22 @@ int main(void)
 	uint8_t channels[4];
 
 	spi_init();
+	oled_reset();
+	_delay_ms(10);
     oled_init();
+
 
     // Start at PAGE0, column 0
     oled_pos(0, 0);
+	for (int i = 0; i < 20; i++)
+	{
+		oled_write_data(0xFF);
+	}
 
     // Test text
-    oled_print("HELLO");
 
-    while (1)
-    {
-    }
+    while (1){
+	}
+	return 0;
 }
 
