@@ -13,7 +13,7 @@ typedef struct {
     uint8_t data[CAN_MAX_DATA_SIZE];
 } CanMessage;
 
-void can_init(void);
+bool can_init(void);
 bool can_send(const CanMessage *message);
 bool can_receive(CanMessage *message);
 void can_test(void);
