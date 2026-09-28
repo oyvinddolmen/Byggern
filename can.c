@@ -5,9 +5,8 @@ void can_init(void){
     can_reset();
     spi_slave_select(CAN);
     spi_transfer_byte(CAN_CMD_WRITE);
-    spi_transfer_byte(0x0F)
+    spi_transfer_byte(0x0F)         // address
     spi_transfer_byte(0x46);       // Loopback, retry, CLKOUT enabled, clock /4
-    spi_transfer_byte(setup);
     spi_slave_select(NONE);
 }
 
