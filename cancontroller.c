@@ -1,7 +1,11 @@
 #include "cancontroller.h"
+#include "spi.h"
+#include <stddef.h>
+#include <util/delay.h>
 
 
 void can_read(uint8_t address, uint8_t *data, uint8_t length){
+    if (data == NULL || length == 0) return;
     spi_slave_select(CAN);
     spi_transfer_byte(CAN_CMD_READ);
     spi_transfer_byte(address);
@@ -15,6 +19,7 @@ void can_read(uint8_t address, uint8_t *data, uint8_t length){
 
 
 void can_write(uint8_t address, const uint8_t *data, uint8_t length){
+    if (data == NULL || length == 0) return;
     
     spi_slave_select(CAN);
     spi_transfer_byte(CAN_CMD_WRITE);
@@ -31,7 +36,7 @@ void can_write(uint8_t address, const uint8_t *data, uint8_t length){
 void can_request_to_send(uint8_t tx_buffer_mask){
     
     spi_slave_select(CAN);
-    spi_transfer_byte(CAN_CMD_REQUEST_TO_SEND | tx_buffer_mask);
+    spi_transfer_byte(CAN_CMD_REQUEST_TO_SEND | (tx_buffer_mask & 0x07));
     spi_slave_select(NONE);
 }
 
@@ -62,4 +67,5 @@ void can_reset(void){
     spi_slave_select(CAN);
     spi_transfer_byte(CAN_CMD_RESET);
     spi_slave_select(NONE);
+    _delay_ms(1); // Allow the controller to settle before register access.
 }
