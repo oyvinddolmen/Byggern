@@ -10,6 +10,7 @@
 #include "oled.h"
 #include "menu.h"
 #include "run.h"
+#include "can.h"
 
 int main() {
     uart_init(31);
@@ -23,12 +24,8 @@ int main() {
 	oled_reset();
 	_delay_ms(10);
     oled_init();
-
-	run_init();
-	run_menu();
-
-    while (1){
-	}
-	return 0;
+	
+	can_init();
+	can_test();
 }
 
