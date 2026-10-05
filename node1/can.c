@@ -6,25 +6,27 @@
 #include <string.h>
 #include <util/delay.h>
 
-#define MCP_CANSTAT   0x0E
-#define MCP_CANCTRL   0x0F
-#define MCP_CNF3      0x28
-#define MCP_CANINTF   0x2C
-#define MCP_RXB0CTRL  0x60
-#define MCP_RXB1CTRL  0x70
-#define MCP_TXB1CTRL  0x40
-#define MCP_TXB1SIDH  0x41
-#define MCP_RXB0SIDH  0x61
-#define MCP_RXB1SIDH  0x71
+#define MCP_CANSTAT   0x0E  // can status
+#define MCP_CANCTRL   0x0F  // can control
+#define MCP_CNF3      0x28  // can bit timing 
+#define MCP_CANINTF   0x2C  // can interupt flag
+#define MCP_RXB0CTRL  0x60  // status receive buffer 0
+#define MCP_RXB1CTRL  0x70  // status receive buffer 1 
+#define MCP_TXB1CTRL  0x40  // status transmit buffer 1
+#define MCP_TXB1SIDH  0x41  // første register i TX-buffer 1
+#define MCP_RXB0SIDH  0x61  // første register i RX-buffer 0 
+#define MCP_RXB1SIDH  0x71  // første register i RX-buffer 1
 
-#define MODE_MASK     0xE0
-#define MODE_CONFIG   0x80
-#define MODE_LOOPBACK 0x40
-#define TX_REQUEST    0x08
-#define RX0_FLAG      0x01
-#define RX1_FLAG      0x02
-#define RX_IDE        0x08
-#define RX_SRR        0x10
+// bitmasker
+#define MODE_MASK     0xE0  // 1110 0000  bit 7-5
+#define MODE_CONFIG   0x80  // 1000 0000  bit 7
+#define MODE_LOOPBACK 0x40  // 0100 0000  bit 6
+#define RX_SRR        0x10  // 0001 0000  bit 4
+#define TX_REQUEST    0x08  // 0000 1000  bit 3
+#define RX_IDE        0x08  // 0000 1000  bit 3
+#define RX1_FLAG      0x02  // 0000 0010  bit 1
+#define RX0_FLAG      0x01  // 0000 0001  bit 0
+
 #define TIMEOUT_MS    100
 
 static bool wait_for_mode(uint8_t requested_mode)
@@ -60,45 +62,55 @@ bool can_init(void)
     return wait_for_mode(MODE_LOOPBACK);
 }
 
+// Skriv can melding til TX-buffer -> request-to-send -> sender melding på can bussen
 bool can_send(const CanMessage *message)
 {
+    // sjekker peker, at id ikke er større enn maks id på 2047 og at meldingen ikke er større enn 8 bytes
     if (message == NULL || message->id > 0x7FF ||
         message->length > 8) {
         return false;
     }
 
+    // sjekk om TX-buffer 1 er ledig før vi legger inn ny melding
     uint8_t status;
     can_read(MCP_TXB1CTRL, &status, 1);
-    if (status & 0x08) return false; // Buffer busy
+    if (status & 0x08) {
+        return false;       // Buffer busy
+    }
 
+    // gjør om message til bytes-arrayet MCP2515 bruker
     uint8_t bytes[13] = {0};
     bytes[0] = message->id >> 3;
     bytes[1] = (message->id & 0x07) << 5;
     bytes[4] = message->length;
-    memcpy(&bytes[5], message->data, message->length);
+    memcpy(&bytes[5], message->data, message->length);  // kopierer bytes fra en plass i minnet til en annen
 
-    can_write(MCP_TXB1SIDH, bytes, 5 + message->length);
-    can_request_to_send(0x02);
+    can_write(MCP_TXB1SIDH, bytes, 5 + message->length); // skriver meldingen til tx-buffer 1
+    can_request_to_send(0x02); // 
     return true;
 }
 
+// sjekk om MCP2515 har mottatt melding -> les melding fra RX buffer -> tolk melding -> lagre i *message
 bool can_receive(CanMessage *message)
 {
     if (message == NULL) return false;
 
     uint8_t flags;
     can_read(MCP_CANINTF, &flags, 1);
-    if (!(flags & 0x01)) return false; // No message in RX0
+    if (!(flags & 0x01)) return false; // sjekk om melding i RX0
 
-    uint8_t bytes[13];
+    uint8_t bytes[13];  
     can_read(MCP_RXB0SIDH, bytes, sizeof bytes);
-    can_bit_modify(MCP_CANINTF, 0x01, 0); // Release RX0
+    can_bit_modify(MCP_CANINTF, 0x01, 0); // Release RX0 by removing flag
 
-    uint8_t length = bytes[4] & 0x0F;
-    if ((bytes[1] & 0x18) || length > 8) {
-        return false; // Discard extended or remote frames
+    uint8_t length = bytes[4] & 0x0F;   // siste 4 bits inneholder lengde
+
+    // sjekker om vi støtter meldingstypen
+    if ((bytes[1] & 0x18) || length > 8) {  // sjekker bits 4 og 3 for extended/remote frame flagg
+        return false; 
     }
 
+    // setter sammen meldingen
     message->id = ((uint16_t)bytes[0] << 3) | (bytes[1] >> 5);
     message->length = length;
     memcpy(message->data, &bytes[5], length);
@@ -111,12 +123,16 @@ void can_test(void)
         printf("CAN initialization failed\n");
         return;
     }
+
+    // lager meldingenog sender
     const CanMessage sent = {.id = 0x321, .length = 2, .data = {0xAA, 0xBB}};
     if (!can_send(&sent)) {
         printf("CAN send failed\n");
         return;
     }
     CanMessage received;
+
+    // venter på mottatt melding
     for (uint8_t elapsed = 0; elapsed < TIMEOUT_MS; elapsed++) {
         if (can_receive(&received)) {
             const bool matches = received.id == sent.id &&
