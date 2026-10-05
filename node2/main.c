@@ -11,7 +11,7 @@
  * If you get errors such as "arm-none-eabi-gcc: no such file", you may need to reinstall the arm gcc packages using
  * apt or your favorite package manager.
  */
-//#include "../path_to/uart.h"
+#include "uart.h"
 
 int main()
 {
@@ -20,8 +20,8 @@ int main()
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
     //Uncomment after including uart above
-    //uart_init(/*cpufreq*/, /*baud*/);
-    //printf("Hello World\n\r");
+    uart_init(840000000, 96000);
+    printf("Hello World\n\r");
 
     while (1)
     {
