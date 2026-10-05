@@ -21,11 +21,11 @@ int main()
 
     //Uncomment after including uart above
     uart_init(840000000, 96000);
-    printf("Hello World\n\r");
+   
 
     while (1)
     {
-        /* code */
+        
     }
     
 }

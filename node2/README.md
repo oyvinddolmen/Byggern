@@ -18,3 +18,9 @@ Starter code for node 2 in TTK4155 Embedded and Industrial Computer Systems Desi
 
 Ignore `Makefile`, `main.c` and `sam/`. Copy `can.*`, `time.*` and `uart.*`
 
+
+
+
+
+
+sudo picocom --baud 9600 --databits 8 --parity n --stopbits 1 /dev/ttyACM0
