@@ -12,6 +12,7 @@
  * apt or your favorite package manager.
  */
 #include "uart.h"
+#include "can.h"
 
 int main()
 {
@@ -21,7 +22,18 @@ int main()
 
     //Uncomment after including uart above
     uart_init(840000000, 96000);
-   
+
+    
+    CanInit timing = {
+        .phase2 = 3,
+        .phase1 = 5,
+        .propag = 4,
+        .sjw    = 0,
+        .brp    = 41,
+        .smp    = 0
+    };
+
+    can_init(timing, 0)
 
     while (1)
     {

@@ -21,6 +21,7 @@
 #define MODE_MASK     0xE0  // 1110 0000  bit 7-5
 #define MODE_CONFIG   0x80  // 1000 0000  bit 7
 #define MODE_LOOPBACK 0x40  // 0100 0000  bit 6
+#define MODE_NORMAL   0x00  // 0000 0000  
 #define RX_SRR        0x10  // 0001 0000  bit 4
 #define TX_REQUEST    0x08  // 0000 1000  bit 3
 #define RX_IDE        0x08  // 0000 1000  bit 3
@@ -59,7 +60,15 @@ bool can_init(void)
     const uint8_t control = 0x46; // Loopback, CLKOUT /4
     can_write(MCP_CANCTRL, &control, 1);
 
-    return wait_for_mode(MODE_LOOPBACK);
+    // Write these while the MCP2515 is in configuration mode.
+    uint8_t timing[] = {
+        0x03, // CNF3: Phase 2 = 4 TQ
+        0xAC, // CNF2: Phase 1 = 6 TQ, propagation = 5 TQ, single sampling
+        0x03  // CNF1: SJW = 1 TQ, BRP = 3
+    };
+    can_write(MCP_CNF3, timing, sizeof timing);
+
+    return wait_for_mode(MODE_NORMAL);
 }
 
 // Skriv can melding til TX-buffer -> request-to-send -> sender melding på can bussen
