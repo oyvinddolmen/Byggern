@@ -12,6 +12,22 @@
 #include "run.h"
 #include "can.h"
 
+void send_joystick_pos(void){
+		JoystickData data = joystick_read();
+	Position joystick_pos = joystick_position(data.x, data.y);
+
+
+	CanMessage message = {
+		.id = 0x123,
+		.length = 2,
+		.data = {joystick_pos.x, joystick_pos.y}
+	};
+
+	can_send(&message);
+}
+
+
+
 int main() {
     uart_init(31);
 	SRAM_init(); 
@@ -27,5 +43,10 @@ int main() {
 	
 	can_init();
 	can_test();
+
+	while(1){
+		send_joystick_pos();
+	}
+
 }
 

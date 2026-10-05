@@ -50,6 +50,9 @@ bool can_init(void)
     // 125 kbit/s with a 16 MHz MCP2515 crystal
     const uint8_t timing[] = {0x03, 0xAC, 0x03};
     can_write(MCP_CNF3, timing, sizeof timing);
+    // CNF3: Phase 2 = 4 TQ
+    // CNF2: Phase 1 = 6 TQ, propagation = 5 TQ, single sampling
+    // CNF1: SJW = 1 TQ, BRP = 3
 
     // Accept all messages; allow RX0 to overflow into RX1
     const uint8_t receive_0 = 0x64;
@@ -57,16 +60,8 @@ bool can_init(void)
     can_write(MCP_RXB0CTRL, &receive_0, 1);
     can_write(MCP_RXB1CTRL, &receive_1, 1);
 
-    const uint8_t control = 0x46; // Loopback, CLKOUT /4
+    const uint8_t control = 0x06; // Normal, CLKOUT /4
     can_write(MCP_CANCTRL, &control, 1);
-
-    // Write these while the MCP2515 is in configuration mode.
-    uint8_t timing[] = {
-        0x03, // CNF3: Phase 2 = 4 TQ
-        0xAC, // CNF2: Phase 1 = 6 TQ, propagation = 5 TQ, single sampling
-        0x03  // CNF1: SJW = 1 TQ, BRP = 3
-    };
-    can_write(MCP_CNF3, timing, sizeof timing);
 
     return wait_for_mode(MODE_NORMAL);
 }

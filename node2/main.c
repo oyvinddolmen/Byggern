@@ -23,7 +23,7 @@ int main()
     //Uncomment after including uart above
     uart_init(840000000, 96000);
 
-    
+
     CanInit timing = {
         .phase2 = 3,
         .phase1 = 5,
@@ -33,11 +33,16 @@ int main()
         .smp    = 0
     };
 
-    can_init(timing, 0)
+    can_init(timing, 0);
 
     while (1)
     {
-        
+        CanMsg message;
+        bool recieved = can_rx(&message);
+        if (recieved){
+            can_printmsg(message);
+        };
+
     }
     
 }
