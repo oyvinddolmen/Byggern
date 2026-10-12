@@ -13,14 +13,17 @@
 #include "can.h"
 
 void send_joystick_pos(void){
-		JoystickData data = joystick_read();
-	Position joystick_pos = joystick_position(data.x, data.y);
+    uint8_t channels[4];
+    adc_read_all(channels);
 
+    Position pos = joystick_position(channels[0], channels[1]);
+
+	print_joystick_position(pos);
 
 	CanMessage message = {
 		.id = 0x123,
 		.length = 2,
-		.data = {joystick_pos.x, joystick_pos.y}
+		.data = {pos.x, pos.y}
 	};
 
 	can_send(&message);

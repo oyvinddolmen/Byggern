@@ -5,7 +5,7 @@
 #include "ioboard.h"
 
 // Dead zone measured in ADC counts. Adjust as needed.
-#define JOYSTICK_DEADZONE 4
+#define JOYSTICK_DEADZONE 8
 
 typedef struct {
     uint8_t min;
@@ -59,23 +59,24 @@ static uint8_t position_percent(uint8_t value, AxisRange range)
 
 void ioboard_init(void)
 {
-    /* Also supports existing main.c, which calls this before spi_init(). */
     spi_init();
     _delay_ms(100);
-    JoystickData center = joystick_read();
-    uint8_t joystick_x_0 = center.x;
-    uint8_t joystick_y_0 = center.y;
-    candidate = stable = JOYSTICK_NONE;
-    stable_samples = 0;
-    direction_armed = true;
-    joystick_x_center = joystick_x_0;
-    joystick_y_center = joystick_y_0;
 
-    joystick_x_range = (AxisRange){joystick_x_0, joystick_x_0};
-    joystick_y_range = (AxisRange){joystick_y_0, joystick_y_0};
+    uint8_t channels[4];
+    adc_read_all(channels);
+
+    joystick_x_center = channels[0];
+    joystick_y_center = channels[1];
+
+    joystick_x_range = (AxisRange){channels[0], channels[0]};
+    joystick_y_range = (AxisRange){channels[1], channels[1]};
 
     touch_x_range = (AxisRange){UINT8_MAX, 0};
     touch_y_range = (AxisRange){UINT8_MAX, 0};
+
+    candidate = stable = JOYSTICK_NONE;
+    stable_samples = 0;
+    direction_armed = true;
 }
 
 void auto_calibrate_joystick(uint8_t x, uint8_t y)
@@ -108,35 +109,37 @@ JoystickDirections joystick_direction(uint8_t x, uint8_t y)
 
 Position joystick_position(uint8_t x, uint8_t y)
 {
+    auto_calibrate_joystick(x,y);
     Position position = {
         .x = position_percent(x, joystick_x_range),
         .y = position_percent(y, joystick_y_range)
     };
-    auto_calibrate_joystick(x,y);
+    if (position.x > 50-JOYSTICK_DEADZONE && position.x < 50+JOYSTICK_DEADZONE){
+        position.x = 50;
+    }
     
     return position;
 }
 
 Position touch_position(uint8_t x, uint8_t y)
 {
+    auto_calibrate_touch(x,y);
     Position position = {
         .x = position_percent(x, touch_x_range),
         .y = position_percent(y, touch_y_range)
     };
-    auto_calibrate_touch(x,y);
+    
 
     return position;
 }
 
 
-void print_joystick_position(uint8_t x, uint8_t y)
+void print_joystick_position(Position pos)
 {
-    Position pos = joystick_position(x, y);
     printf("Joystick position: X=%3d%%, Y=%3d%%\n", pos.x, pos.y);
 }
-void print_touch_position(uint8_t x, uint8_t y)
+void print_touch_position(Position pos)
 {
-    Position pos = touch_position(x, y);
     printf("Touch position: X=%3d%%, Y=%3d%%\n", pos.x, pos.y);
 }
 

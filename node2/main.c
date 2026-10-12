@@ -53,6 +53,7 @@ int main()
         if (recieved){
             can_printmsg(message);
         };
+        pwm_pulse_from_controller();
 
     }
     

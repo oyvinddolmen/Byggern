@@ -51,8 +51,8 @@ Position joystick_position(uint8_t x, uint8_t y);
 Position touch_position(uint8_t x, uint8_t y);
 JoystickData joystick_read(void);
 
-void print_joystick_position(uint8_t x, uint8_t y);
-void print_touch_position(uint8_t x, uint8_t y);
+void print_joystick_position(Position pos);
+void print_touch_position(Position pos);
 
 /* Call about every 10 ms; three equal samples debounce transitions. */
 JoystickInput poll_joystick(void);

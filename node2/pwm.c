@@ -72,13 +72,23 @@ void pwm_set_pulse_us(uint32_t pulse_us)
         pulse_us;
 }
 
+uint32_t joystickpos_to_pulse(uint8_t pos)
+{
+    if (pos > 100u) {
+        pos = 100u;
+    }
+
+    return 900u + (uint32_t)pos * 12u;
+}
+
 void pwm_pulse_from_controller(void){
 
     CanMsg message;
     
     bool recieved = can_rx(&message);
     if (recieved){
-        can_printmsg(message);
+        uint8_t xpos = message.byte[0];
+        pwm_set_pulse_us(joystickpos_to_pulse(xpos));
     };
 }
 
