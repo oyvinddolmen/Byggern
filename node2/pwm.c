@@ -1,6 +1,22 @@
 #include "sam.h"
 #include "pwm.h"
 
+/*
+ * Registre brukt:
+ * PMC_PCER0   : Aktiver PIOB-klokken, bit 12.
+ * PMC_PCER1   : Aktiver PWM-klokken, bit 4 (periferi-ID 36).
+ * PIO_ABSR    : Velg periferifunksjon B, bit 13.
+ * PIO_PDR     : Overlat PB13 til periferien, bit 13.
+ * PWM_DIS     : Deaktiver kanal 1, bit 1.
+ * PWM_SR      : Les kanalstatus, bit 1.
+ * PWM_CLK     : DIVA [7:0], PREA [11:8].
+ * PWM_CMR     : CPRE [3:0], CALG bit 8, CPOL bit 9.
+ * PWM_CPRD    : PWM-perioden i klokketikk.
+ * PWM_CDTY    : Pulsbredden i klokketikk.
+ * PWM_CDTYUPD : Oppdater pulsbredde ved neste periode.
+ * PWM_ENA     : Aktiver kanal 1, bit 1.
+ */
+
 #define SERVO_PWM_CHANNEL  1u
 #define SERVO_PWM_MASK     (1u << SERVO_PWM_CHANNEL)
 #define SERVO_PIN_MASK     (1u << 13)
@@ -55,3 +71,14 @@ void pwm_set_pulse_us(uint32_t pulse_us)
     PWM->PWM_CH_NUM[SERVO_PWM_CHANNEL].PWM_CDTYUPD =
         pulse_us;
 }
+
+void pwm_pulse_from_controller(void){
+
+    CanMsg message;
+    
+    bool recieved = can_rx(&message);
+    if (recieved){
+        can_printmsg(message);
+    };
+}
+
