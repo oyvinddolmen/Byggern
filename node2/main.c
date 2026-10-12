@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "sam.h"
+#include "pwm.h"
 
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
@@ -18,6 +19,15 @@ int main()
 {
     SystemInit();
 
+
+
+    WDT->WDT_MR = WDT_MR_WDDIS;
+
+    pwm_init();
+
+
+
+    
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
     //Uncomment after including uart above
@@ -34,6 +44,7 @@ int main()
     };
 
     can_init(timing, 0);
+
 
     while (1)
     {
