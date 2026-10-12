@@ -14,6 +14,8 @@
  */
 #include "uart.h"
 #include "can.h"
+#include "diode.h"
+#include "game.h"
 
 int main()
 {
@@ -45,15 +47,20 @@ int main()
 
     can_init(timing, 0);
 
+    adc_init(7); // Initialize ADC channel 7 (A0)
+
+
 
     while (1)
     {
         CanMsg message;
         bool recieved = can_rx(&message);
         if (recieved){
-            can_printmsg(message);
         };
         pwm_pulse_from_controller();
+
+        score_update(adc_read());
+        printf("Score: %d\n", score_get());
 
     }
     
