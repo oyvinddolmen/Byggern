@@ -49,7 +49,7 @@ void pwm_init(void)
     // 7. Periode: 20 000 us = 20 ms.
     PWM->PWM_CH_NUM[SERVO_PWM_CHANNEL].PWM_CPRD = 20000u;
 
-    // 8. Høy puls: 1 500 us = 1,5 ms.
+    // 8. Høy puls: 1 500 us = 1,5 ms gir servo til senter posisjon
     PWM->PWM_CH_NUM[SERVO_PWM_CHANNEL].PWM_CDTY = 1500u;
 
     // 9. Start PWM-kanal 1.

@@ -20,21 +20,10 @@
 int main()
 {
     SystemInit();
-
-
-
     WDT->WDT_MR = WDT_MR_WDDIS;
-
     pwm_init();
-
-
-
-    
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
-
-    //Uncomment after including uart above
     uart_init(840000000, 96000);
-
 
     CanInit timing = {
         .phase2 = 3,
@@ -46,10 +35,7 @@ int main()
     };
 
     can_init(timing, 0);
-
     adc_init(7); // Initialize ADC channel 7 (A0)
-
-
 
     while (1)
     {
@@ -61,7 +47,5 @@ int main()
 
         score_update(adc_read());
         printf("Score: %d\n", score_get());
-
     }
-    
 }
