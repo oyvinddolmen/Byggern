@@ -1,104 +1,102 @@
 #include "PID.h"
+#include <stdbool.h>
 
-// CALIBRATION:
-// Place racket at LEFT position before encoder_init().
-// Measure encoder count at RIGHT position and set below.
-// Can be negative. Zero disables motor regulation.
+// IMPORTANT: Verify this number by moving the racket manually
+// from the known LEFT endpoint to the RIGHT endpoint.
+// It may be negative if encoder counts decrease towards the right.
 #define ENCODER_FULL_TRAVEL_COUNTS 1600
 
-// +1 if motor_set(>50) moves racket to the right.
-// Otherwise use -1.
-#define MOTOR_SIGN_FOR_RIGHT 1
+// Set to +1 when motor_set_x(>50) moves towards the right;
+// otherwise set to -1. Verify at low power before enabling PID.
+#define MOTOR_SIGN_FOR_RIGHT -1
 
-// Controller gains
-#define KP 0.6f
-#define KI 0.0f  // Start with P, then try 0.1f
+// Start with P control. Increase KI later if friction creates an offset.
+// KD is normally unnecessary for this lab (encoder differentiation is noisy).
+#define PID_KP 1.0f
+#define PID_KI 0.0f
+#define PID_KD 0.0f
 
-#define MAX_PWM_PERCENT 25.0f
-#define INTEGRAL_LIMIT 250.0f
+// Max change from motor_set_x(50), in command points.
+// Note that motor.c additionally applies its own deadzone and 0.3 scaling.
+#define MAX_COMMAND_OFFSET 30.0f
+#define INTEGRAL_LIMIT 150.0f
 #define POSITION_TOLERANCE 1.0f
 #define REFERENCE_MARGIN 10.0f
 
 static float integral = 0.0f;
+static float prev_position = 0.0f;
+static bool have_prev_position = false;
 
-static float clampf(float x, float low, float high)
+static float limit(float value, float low, float high)
 {
-    if (x < low) return low;
-    if (x > high) return high;
-    return x;
+    if (value < low) return low;
+    if (value > high) return high;
+    return value;
 }
 
-void controller_reset(void)
+void pid_reset(void)
 {
     integral = 0.0f;
+    prev_position = 0.0f;
+    have_prev_position = false;
 }
 
-int16_t controller_update(uint8_t joystick_pct,
-                          int32_t encoder_counts,
-                          float dt)
+uint8_t pid_update(uint8_t joystick_x, int32_t encoder_counts, float dt)
 {
-    // No calibration? Keep motor stopped.
-    if (ENCODER_FULL_TRAVEL_COUNTS == 0 || dt <= 0.0f) {
-        controller_reset();
-        return 50;
+    if (ENCODER_FULL_TRAVEL_COUNTS == 0 || dt <= 0.0f || dt > 0.25f) {
+        pid_reset();
+        return 50u;
     }
 
-    // Convert encoder count to position in percent.
-    float position = 100.0f * (float)encoder_counts /
+    // Convert encoder position to percent of calibrated travel.
+    // Do NOT clamp measured position: out-of-range measurements are
+    // important for detecting an attempted move beyond an endpoint.
+    float position = (100.0f * (float)encoder_counts) /
                      (float)ENCODER_FULL_TRAVEL_COUNTS;
 
-    position = clampf(position, 0.0f, 100.0f);
-
-    // Joystick determines desired position.
-    // Keep a 10% margin from mechanical endpoints.
-    float reference = clampf((float)joystick_pct,
-                             REFERENCE_MARGIN,
-                             100.0f - REFERENCE_MARGIN);
-
-    // Position error
+    // Joystick directly supplies 0..100; no scaling is needed.
+    float reference = limit((float)joystick_x,
+                            REFERENCE_MARGIN, 100.0f - REFERENCE_MARGIN);
     float error = reference - position;
 
-    // Stop very close to reference.
-    if (error > -POSITION_TOLERANCE &&
-        error < POSITION_TOLERANCE) {
-        controller_reset();
-        return 50;
+    // Derivative on measurement avoids a large kick on reference changes.
+    float d_position = 0.0f;
+    if (have_prev_position) {
+        d_position = (position - prev_position) / dt;
+    }
+    prev_position = position;
+    have_prev_position = true;
+
+    if (error > -POSITION_TOLERANCE && error < POSITION_TOLERANCE) {
+        integral = 0.0f;
+        return 50u;
     }
 
-    // Integral update
-    float next_integral = clampf(
-        integral + error * dt,
-        -INTEGRAL_LIMIT,
-        INTEGRAL_LIMIT
-    );
+    // Candidate integral and output for simple conditional anti-windup.
+    float candidate_integral = limit(integral + error * dt,
+                                     -INTEGRAL_LIMIT, INTEGRAL_LIMIT);
+    float candidate_u = PID_KP * error + PID_KI * candidate_integral
+                        - PID_KD * d_position;
 
-    float next_u = KP * error + KI * next_integral;
-
-    // Simple anti-windup
-    if (!((next_u > MAX_PWM_PERCENT && error > 0.0f) ||
-          (next_u < -MAX_PWM_PERCENT && error < 0.0f))) {
-        integral = next_integral;
+    if (!((candidate_u > MAX_COMMAND_OFFSET && error > 0.0f) ||
+          (candidate_u < -MAX_COMMAND_OFFSET && error < 0.0f))) {
+        integral = candidate_integral;
     }
 
-    // PI output: signed PWM percentage
-    float u = KP * error + KI * integral;
+    float u = PID_KP * error + PID_KI * integral - PID_KD * d_position;
+    u = limit(u, -MAX_COMMAND_OFFSET, MAX_COMMAND_OFFSET);
 
-    u = clampf(u, -MAX_PWM_PERCENT, MAX_PWM_PERCENT);
-
-    // Stop commands that would drive beyond endpoints.
+    // Software endpoint protection (only valid with verified calibration).
     if ((position <= 0.0f && u < 0.0f) ||
         (position >= 100.0f && u > 0.0f)) {
-        controller_reset();
-        return 50;
+        pid_reset();
+        return 50u;
     }
 
-    // motor_set(0..100) has neutral at 50.
-    // Therefore halve the signed PWM percentage.
-    float delta = MOTOR_SIGN_FOR_RIGHT * u * 0.5f;
-
-    int32_t motor_command = 50 +
-        (int32_t)(delta + (delta >= 0 ? 0.5f : -0.5f));
-
-    return (int16_t)motor_command;
+    // motor_set_x() expects 0..100, center 50 = stop.
+    float offset = (float)MOTOR_SIGN_FOR_RIGHT * u;
+    int32_t command = 50 + (int32_t)(offset + (offset >= 0.0f ? 0.5f : -0.5f));
+    if (command < 0) command = 0;
+    if (command > 100) command = 100;
+    return (uint8_t)command;
 }
-

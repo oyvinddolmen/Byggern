@@ -73,3 +73,4 @@ void motor_set_x(uint8_t x)
     /* Applied at the next PWM period boundary, within 50 us. */
     PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD = duty;
 }
+

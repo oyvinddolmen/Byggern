@@ -17,6 +17,7 @@ SOURCE_FILES = \
 	motor.c \
 	solenoid.c \
 	time.c \
+	PID.c \
 #   filename2.c \
 #	filenameN.c
 
