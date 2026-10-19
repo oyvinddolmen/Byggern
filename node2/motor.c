@@ -73,3 +73,114 @@ void motor_set_x(uint8_t x)
     /* Applied at the next PWM period boundary, within 50 us. */
     PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD = duty;
 }
+
+#include "pid.h"
+#include "encoder.h"
+
+void motor_set_x_pid(uint8_t x, int32_t left,
+                     int32_t right, float dt)
+{
+    static PID pid = {.kp = 1.0f};
+
+    if (left == right || dt <= 0.0f) {
+        pid_reset(&pid);
+        motor_set_speed(0);
+        return;
+    }
+
+    if (x > 100) x = 100;
+
+    float position =
+        100.0f * ((float)encoder_read() - (float)left) /
+        ((float)right - (float)left);
+
+    float output = pid_update(&pid, (float)x, position, dt);
+
+    motor_set_speed((int16_t)output);
+}
+
+#include <stdbool.h>
+#include <stdint.h>
+#include "motor.h"
+#include "encoder.h"
+#include "time.h"
+
+
+
+MotorLimits motor_find_limits(void)
+{
+    MotorLimits limits = {0};
+    int32_t endpoints[2];
+
+    for (uint8_t side = 0; side < 2; side++) {
+        // Existing motor interface: below 50 = left, above 50 = right.
+        motor_set_x(side == 0 ? 20 : 80);
+
+        // Allow the motor to start moving.
+        time_spinFor(msecs(300));
+
+        int32_t previous = encoder_read();
+        uint8_t stationary = 0;
+        bool found = false;
+
+        // Maximum five seconds per direction.
+        for (uint16_t sample = 0; sample < 500; sample++) {
+            time_spinFor(msecs(10));
+
+            int32_t current = encoder_read();
+
+            if (current == previous) {
+                stationary++;
+            } else {
+                stationary = 0;
+            }
+
+            previous = current;
+
+            if (stationary >= 20) {
+                found = true;
+                break;
+            }
+        }
+
+        motor_set_x(50);
+        time_spinFor(msecs(50));
+
+        if (!found) {
+            return limits; // Timeout: valid remains false.
+        }
+
+        endpoints[side] = encoder_read();
+    }
+
+    limits.left = endpoints[0];
+    limits.right = endpoints[1];
+    limits.valid = (limits.left != limits.right);
+
+    return limits;
+}
+
+void motor_set_speed(int16_t speed)
+{
+    if (speed > 100) speed = 100;
+    if (speed < -100) speed = -100;
+
+    if (MOTOR_REVERSE) {
+        speed = -speed;
+    }
+
+    uint32_t magnitude;
+
+    if (speed < 0) {
+        PIOC->PIO_CODR = MOTOR_PHASE_PIN;
+        magnitude = (uint32_t)(-speed);
+    } else {
+        if (speed > 0) {
+            PIOC->PIO_SODR = MOTOR_PHASE_PIN;
+        }
+        magnitude = (uint32_t)speed;
+    }
+
+    PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD =
+        magnitude * MOTOR_PWM_PERIOD / 100u;
+}

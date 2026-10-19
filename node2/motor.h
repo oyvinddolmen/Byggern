@@ -2,6 +2,7 @@
 #define MOTOR_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /* A3959: PB12 (PWMH0, peripheral B) = ENABLE; PC23 = PHASE.
  * Pin mapping follows this project's existing pwm.c.
@@ -13,5 +14,17 @@ void motor_init(void);
  * Call after motor_init(). This function does not receive CAN messages.
  */
 void motor_set_x(uint8_t x);
+void motor_set_x_pid(uint8_t x, int32_t left,
+                     int32_t right, float dt);
+
+typedef struct {
+    int32_t left;
+    int32_t right;
+    bool valid;
+} MotorLimits;
+
+MotorLimits motor_find_limits(void);
+
+void motor_set_speed(int16_t speed);
 
 #endif
