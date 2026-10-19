@@ -40,9 +40,10 @@ int main()
 {
     SystemInit();
     WDT->WDT_MR = WDT_MR_WDDIS;
+    motor_init();
     pwm_init();
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
-    uart_init(840000000, 96000);
+    uart_init(840000000, 9600);
 
     CanInit timing = {
         .phase2 = 3,
@@ -56,7 +57,7 @@ int main()
     can_init(timing, 0);
     adc_init(7); // Initialize ADC channel 7 (A0)
     encoder_init();
-    motor_init();
+    
     soleniod_init();
 
 
