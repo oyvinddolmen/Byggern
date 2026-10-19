@@ -3,11 +3,15 @@
 
 #include <stdint.h>
 
-// Initialize PB12 / D20 as motor PWM (1 kHz) and PC23 / D7 as direction.
+/* A3959: PB12 (PWMH0, peripheral B) = ENABLE; PC23 = PHASE.
+ * Pin mapping follows this project's existing pwm.c.
+ */
 void motor_init(void);
 
-// Signed command from -100 to +100. Magnitude is PWM duty cycle (%)
-// and sign chooses direction. Zero gives 0% PWM.
+/* Node 1 joystick X: 0..100, centre = 50.
+ * 45..55 stops; deflection controls PWM duty, sign controls PHASE.
+ * Call after motor_init(). This function does not receive CAN messages.
+ */
 void motor_set_x(uint8_t x);
 
 #endif
