@@ -52,13 +52,15 @@ int main(void)
             message.length == 1 &&
             message.data[0] == 0xFF) {
             menu_game_over();
-            
+
             CanMessage game_over_message = {
                 .id = 0x12,
                 .length = 3,
                 .data = {50, 50, BTN_NONE}
             };
-            can_send(&game_over_message);
+            while(!can_send(&game_over_message)) {
+                can_send(&game_over_message);
+            }
         }
 
         _delay_ms(10);
