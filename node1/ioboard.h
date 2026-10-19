@@ -40,7 +40,7 @@ typedef struct {
     uint8_t btn;
 } JoystickData;
 
-tydedef struct {
+typedef struct {
     bool right;
     bool left;
     uint8_t number;
@@ -48,7 +48,7 @@ tydedef struct {
 
 typedef enum {
     PRESSED,
-    NONE
+    BTN_NONE
 } ButtonState;
 
 
