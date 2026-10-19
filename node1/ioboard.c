@@ -5,7 +5,7 @@
 #include "ioboard.h"
 
 // Dead zone measured in ADC counts. Adjust as needed.
-#define JOYSTICK_DEADZONE 8
+#define JOYSTICK_DEADZONE 12
 
 typedef struct {
     uint8_t min;

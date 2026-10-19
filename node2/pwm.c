@@ -88,19 +88,19 @@ uint32_t joystickpos_to_pulse(uint8_t pos)
 }
 
 
-void controller_update(void)
+void pwm_pulse_from_controller(CanMsg *message)
 {
-    CanMsg message;
+    uint8_t xpos = message->byte[0];
+    uint8_t ypos = message->byte[1];
 
-    if (can_rx(&message))
-    {
-        uint8_t xpos = message.byte[0];
-        uint8_t ypos = message.byte[1];
 
-        // Y-axis controls the servo.
-        pwm_set_pulse_us(joystickpos_to_pulse(ypos));
+    printf("X position: %u, Y position: %u\n",
+           (unsigned int)xpos,
+           (unsigned int)ypos);
 
-        // X-axis controls the motor.
-        motor_set_x(xpos);
-    }
+    // Y-axis controls the servo.
+    pwm_set_pulse_us(joystickpos_to_pulse(ypos));
+
+    // X-axis controls the motor.
+    motor_set_x(xpos);
 }

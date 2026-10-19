@@ -8,6 +8,6 @@ void motor_init(void);
 
 // Signed command from -100 to +100. Magnitude is PWM duty cycle (%)
 // and sign chooses direction. Zero gives 0% PWM.
-void motor_set_x(int8_t x);
+void motor_set_x(uint8_t x);
 
 #endif

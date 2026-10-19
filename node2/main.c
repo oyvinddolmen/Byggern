@@ -31,6 +31,7 @@ void update_from_message(void){
         if (message.id == 0x12 && message.length == 3){
             soleniod_activate(&message);
             pwm_pulse_from_controller(&message);
+            
         }
     }
 }
@@ -56,7 +57,6 @@ int main()
     adc_init(7); // Initialize ADC channel 7 (A0)
     encoder_init();
     motor_init();
-    motor_set_x(50);
     soleniod_init();
 
 
@@ -72,6 +72,5 @@ int main()
         int32_t position = encoder_read();
         //printf("Encoder position: %ld\n", (long)position);
 
-        //controller_update();    // sets motor and servo based on CAN messages
     }
 }
