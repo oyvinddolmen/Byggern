@@ -43,6 +43,7 @@ int main() {
 	oled_reset();
 	_delay_ms(10);
     oled_init();
+	menu_init();
 	
 	can_init();
 	can_test();

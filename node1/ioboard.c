@@ -118,6 +118,10 @@ Position joystick_position(uint8_t x, uint8_t y)
         position.x = 50;
     }
     
+    if (position.y > 50-JOYSTICK_DEADZONE && position.y < 50+JOYSTICK_DEADZONE){
+        position.y = 50;
+    }
+    
     return position;
 }
 
