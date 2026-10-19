@@ -24,17 +24,7 @@
 #include "game.h"
 #include "solenoid.h"
 
-void update_from_message(void){
-    CanMsg message;
-    bool received = can_rx(&message);
-    if (received){
-        if (message.id == 0x12 && message.length == 3){
-            soleniod_activate(&message);
-            pwm_pulse_from_controller(&message);
-            
-        }
-    }
-}
+
 
 int main()
 {
@@ -58,18 +48,5 @@ int main()
     encoder_init();
     soleniod_init();
 
-    printf("----------------------------------------------------\n");
-
-    while (1)
-    {
-        update_from_message();
-        soleniod_update();
-
-        score_update(adc_read());
-        //printf("Score: %d\n", score_get());
-
-        int32_t position = encoder_read();
-        printf("Encoder position: %ld\n", (long)position);
-
-    }
+    run_game();
 }
