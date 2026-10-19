@@ -68,7 +68,7 @@ void motor_set_x(uint8_t x)
         duty = (magnitude - MOTOR_DEADZONE) * MOTOR_PWM_PERIOD /
                (MOTOR_CENTRE - MOTOR_DEADZONE);
     }
-    duty = duty*0.3;
+    duty = duty;
 
     /* Applied at the next PWM period boundary, within 50 us. */
     PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD = duty;

@@ -4,7 +4,7 @@
 // IMPORTANT: Verify this number by moving the racket manually
 // from the known LEFT endpoint to the RIGHT endpoint.
 // It may be negative if encoder counts decrease towards the right.
-#define ENCODER_FULL_TRAVEL_COUNTS 1600
+#define ENCODER_FULL_TRAVEL_COUNTS 2800
 
 // Set to +1 when motor_set_x(>50) moves towards the right;
 // otherwise set to -1. Verify at low power before enabling PID.
@@ -12,15 +12,15 @@
 
 // Start with P control. Increase KI later if friction creates an offset.
 // KD is normally unnecessary for this lab (encoder differentiation is noisy).
-#define PID_KP 1.0f
-#define PID_KI 0.0f
-#define PID_KD 0.0f
+#define PID_KP 50f
+#define PID_KI 5f
+#define PID_KD 25f
 
 // Max change from motor_set_x(50), in command points.
 // Note that motor.c additionally applies its own deadzone and 0.3 scaling.
 #define MAX_COMMAND_OFFSET 30.0f
 #define INTEGRAL_LIMIT 150.0f
-#define POSITION_TOLERANCE 1.0f
+#define POSITION_TOLERANCE 5.0f
 #define REFERENCE_MARGIN 10.0f
 
 static float integral = 0.0f;

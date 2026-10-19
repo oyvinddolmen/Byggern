@@ -14,7 +14,7 @@
 #include "solenoid.h"
 #include "time.h"
 
-#define CONTROL_PERIOD_MS 10u
+#define CONTROL_PERIOD_MS 1000u
 #define CAN_TIMEOUT_MS 250u
 #define PRINT_PERIOD_MS 250u
 
@@ -57,6 +57,7 @@ int main(void)
         CanMsg message;
         uint64_t now = time_now();
 
+        
         // A single CAN read supplies BOTH servo and position reference.
         if (can_rx(&message)) {
             if (message.id == 0x12u && message.length == 3u) {
@@ -89,18 +90,20 @@ int main(void)
             if (!have_can || (now - last_can) > msecs(CAN_TIMEOUT_MS)) {
                 pid_reset();
                 motor_set_x(50); // CAN timeout or no first command
+                //printf("CAN timeout: stopping motor\n");
             } else {
                 int32_t position = encoder_read();
                 uint8_t command = pid_update(joystick_x, position, dt);
+                printf("position=%ld, joystick_x=%u, command=%u\n",
+                   position, joystick_x, command);
                 motor_set_x(command);
             }
         }
 
         if ((now - last_print) >= msecs(PRINT_PERIOD_MS)) {
             last_print = now;
-            printf("Encoder: %ld, reference: %u, score: %u\n",
-                   (long)encoder_read(), (unsigned)joystick_x,
-                   (unsigned)score_get());
         }
+
+
     }
 }
