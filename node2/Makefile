@@ -14,6 +14,7 @@ SOURCE_FILES = \
 	diode.c \
 	game.c \
 	encoder.c \
+	motor.c \
 #   filename2.c \
 #	filenameN.c
 

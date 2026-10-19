@@ -3,6 +3,11 @@
 #include "sam.h"
 #include "pwm.h"
 #include "encoder.h"
+#include "uart.h"
+#include "can.h"
+#include "diode.h"
+#include "game.h"
+#include "motor.h"
 
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
@@ -13,10 +18,6 @@
  * If you get errors such as "arm-none-eabi-gcc: no such file", you may need to reinstall the arm gcc packages using
  * apt or your favorite package manager.
  */
-#include "uart.h"
-#include "can.h"
-#include "diode.h"
-#include "game.h"
 
 int main()
 {
@@ -39,9 +40,11 @@ int main()
     adc_init(7); // Initialize ADC channel 7 (A0)
     encoder_init();
     motor_init();
+    motor_set_x(50);
 
     while (1)
     {
+        pwm_pulse_from_controller();
 
         score_update(adc_read());
         //printf("Score: %d\n", score_get());
@@ -49,6 +52,6 @@ int main()
         int32_t position = encoder_read();
         //printf("Encoder position: %ld\n", (long)position);
 
-        controller_update();
+        controller_update();    // sets motor and servo based on CAN messages
     }
 }
