@@ -17,6 +17,18 @@
 #include "can.h"
 #include "diode.h"
 #include "game.h"
+#include "solenoid.h"
+
+void update_from_message(void){
+    CanMsg message;
+    bool received = can_rx(&message);
+    if (received){
+        if (message.id == 0x12 && message.length == 3){
+            soleniod_activate(&message);
+            pwm_pulse_from_controller(&message);
+        }
+    }
+}
 
 int main()
 {
@@ -38,10 +50,12 @@ int main()
     can_init(timing, 0);
     adc_init(7); // Initialize ADC channel 7 (A0)
     encoder_init();
-    motor_init();
+    soleniod_init();
 
     while (1)
     {
+        update_from_message();
+        soleniod_update();
 
         score_update(adc_read());
         //printf("Score: %d\n", score_get());
