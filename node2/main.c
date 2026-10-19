@@ -18,6 +18,17 @@
 #include "diode.h"
 #include "game.h"
 
+void update_from_message(void){
+    CanMsg message;
+    bool received = can_rx(&message);
+    if (received){
+        if (message.id == 0x123){
+            soleniod_activate(&message);
+            pwm_pulse_from_controller(&message);
+        }
+    }
+}
+
 int main()
 {
     SystemInit();
@@ -41,7 +52,7 @@ int main()
 
     while (1)
     {
-        pwm_pulse_from_controller();
+        update_from_message();
 
         score_update(adc_read());
         //printf("Score: %d\n", score_get());
