@@ -62,5 +62,7 @@ int main()
 
         int32_t position = encoder_read();
         //printf("Encoder position: %ld\n", (long)position);
+
+        controller_update();
     }
 }
