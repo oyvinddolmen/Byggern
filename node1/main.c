@@ -30,7 +30,6 @@ void send_joystick_pos(void){
 }
 
 
-
 int main() {
     uart_init(31);
 	SRAM_init(); 
