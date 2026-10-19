@@ -23,7 +23,7 @@ void update_from_message(void){
     CanMsg message;
     bool received = can_rx(&message);
     if (received){
-        if (message.id == 0x123){
+        if (message.id == 0x12 && message.length == 3){
             soleniod_activate(&message);
             pwm_pulse_from_controller(&message);
         }

@@ -47,8 +47,8 @@ typedef struct {
 } Button;
 
 typedef enum {
-    PRESSED,
-    BTN_NONE
+    PRESSED = 1,
+    BTN_NONE = 0
 } ButtonState;
 
 

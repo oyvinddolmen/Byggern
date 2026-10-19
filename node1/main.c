@@ -20,10 +20,10 @@ void send_iodata(void){
 
 	print_joystick_position(pos);
 
-	buttonState button_state = button_read((Button){.right = true, .left = false, .number = 5});
+	ButtonState button_state = button_read((Button){.right = true, .left = false, .number = 5});
 
 	CanMessage message = {
-		.id = 0x123,
+		.id = 0x12,
 		.length = 3,
 		.data = {pos.x, pos.y, button_state}
 	};
@@ -49,6 +49,7 @@ int main() {
 	
 	can_init();
 	can_test();
+	soleniod_init();
 
 	while(1){
 		send_iodata();

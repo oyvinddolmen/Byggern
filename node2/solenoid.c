@@ -27,7 +27,7 @@ void soleniod_activate(CanMsg *message)
 {
     if (message == NULL || message->length != 3) return;
 
-    // Node1 sends {x, y, button_state}: PRESSED = 0, NONE = 1.
+    // Node1 sends {x, y, button_state}: PRESSED = 1, NONE = 0.
     if (message->byte[2] > 1u) return;
     bool pressed = (message->byte[2] == 0u);
 
