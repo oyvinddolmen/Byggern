@@ -40,8 +40,8 @@ int main()
 {
     SystemInit();
     WDT->WDT_MR = WDT_MR_WDDIS;
+    motor_init();
     pwm_init();
-    WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
     uart_init(840000000, 96000);
 
     CanInit timing = {
@@ -56,13 +56,12 @@ int main()
     can_init(timing, 0);
     adc_init(7); // Initialize ADC channel 7 (A0)
     encoder_init();
-    motor_init();
     soleniod_init();
 
+    printf("----------------------------------------------------\n");
 
     while (1)
     {
-
         update_from_message();
         soleniod_update();
 
@@ -70,7 +69,7 @@ int main()
         //printf("Score: %d\n", score_get());
 
         int32_t position = encoder_read();
-        //printf("Encoder position: %ld\n", (long)position);
+        printf("Encoder position: %ld\n", (long)position);
 
     }
 }
