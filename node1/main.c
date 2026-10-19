@@ -20,7 +20,7 @@ void send_iodata(void){
 
 	print_joystick_position(pos);
 
-	buttonState button_state = button_read((Button){.right = true, .left = false, .number = 6});
+	buttonState button_state = button_read((Button){.right = true, .left = false, .number = 5});
 
 	CanMessage message = {
 		.id = 0x123,

@@ -71,4 +71,6 @@ JoystickInput poll_joystick(void);
 void adc_read_all(uint8_t channels[4]);
 void adc_print_all(uint8_t channels[4]);
 
+ButtonState button_read(Button button);
+
 #endif
