@@ -1,8 +1,23 @@
 #include "menu.h"
 #include <stddef.h>
+#include "clock.h"
 
 Menu main_menu;
 Menu difficulty_menu;
+
+static uint32_t final_seconds;
+static void start_game(void);
+static void return_to_main_menu(void);
+
+static Menu playing_menu = {"Playing", NULL, 0, NULL};
+static MenuItem game_over_items[] = {
+    {"Retry", MENU_ACTION, .action = start_game},
+    {"Main Menu", MENU_ACTION, .action = return_to_main_menu}
+};
+static Menu game_over_menu = {
+    "Game Over", game_over_items,
+    sizeof(game_over_items) / sizeof(MenuItem), NULL
+};
 
 Menu *current_menu = &main_menu;
 uint8_t selected_item_index = 0;
@@ -23,9 +38,8 @@ static MenuItem difficulty_items[] = {
     //Main
 
 static MenuItem main_items[] = {
-        {"Start Game", MENU_ACTION, .action = NULL}, // Placeholder
-        {"Difficulty", MENU_SUBMENU, .submenu = &difficulty_menu},
-        {"Exit", MENU_ACTION, .action = NULL} // Placeholder
+        {"Start Game", MENU_ACTION, .action = start_game},
+        {"Difficulty", MENU_SUBMENU, .submenu = &difficulty_menu}
     };
 
     Menu main_menu = {
@@ -90,4 +104,41 @@ void set_easy(void) {
 }
 void set_hard(void) {
     // Set game difficulty to hard
+}
+
+static void start_game(void)
+{
+    game_timer_reset();
+    final_seconds = 0;
+    current_menu = &playing_menu;
+    selected_item_index = 0;
+}
+
+static void return_to_main_menu(void)
+{
+    menu_init();
+}
+
+bool menu_game_running(void)
+{
+    return current_menu == &playing_menu;
+}
+
+bool menu_game_finished(void)
+{
+    return current_menu == &game_over_menu;
+}
+
+uint32_t menu_game_seconds(void)
+{
+    return menu_game_running() ? game_timer_seconds() : final_seconds;
+}
+
+/* Call from the main loop when a game-over event is received. */
+void menu_game_over(void)
+{
+    if (!menu_game_running()) return;
+    final_seconds = game_timer_seconds();
+    current_menu = &game_over_menu;
+    selected_item_index = 0;
 }

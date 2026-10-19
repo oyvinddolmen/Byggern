@@ -4,29 +4,8 @@
 #include "diode.h"
 #include "can.h"
 
-static uint16_t score = 0;
 static bool beam_blocked = false;
 
-void score_update(uint16_t adc_value)
-{
-    if (!beam_blocked && adc_value < 800) {
-        score++;
-        beam_blocked = true;
-    } else if (beam_blocked && adc_value > 900) {
-        beam_blocked = false;
-    }
-}
-
-uint16_t score_get(void)
-{
-    return score;
-}
-
-void score_reset(void)
-{
-    score = 0;
-    // Keep beam state: resetting must not recount a blocked beam.
-}
 
 void update_from_message(void){
     CanMsg message;
@@ -39,18 +18,27 @@ void update_from_message(void){
         }
     }
 }
-void send_score(void){
+void send_game_over(void){
     CanMsg message;
     message.id = 0x13;
     message.length = 1;
-    message.byte[0] = score_get();
+    message.byte[0] = 0xFF;
 
     can_tx(message);
 }
 
+void check_game_over(uint16_t adc_value)
+{
+    if (!beam_blocked && adc_value < 800) {
+        send_game_over();
+        beam_blocked = true;
+    } else if (beam_blocked && adc_value > 900) {
+        beam_blocked = false;
+    }
+}
+
 void run_game(void)
 {
-    score_reset();
     beam_blocked = false;
     diode_init(7); // Initialize ADC channel 7 (A0)
 
@@ -60,7 +48,6 @@ void run_game(void)
         update_from_message();
         soleniod_update();
 
-        score_update(adc_read());
-        send_score();
+        check_game_over(adc_read());
     }
 }
