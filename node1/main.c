@@ -12,7 +12,7 @@
 #include "run.h"
 #include "can.h"
 
-void send_iodata(void){
+void send_joystick_pos(void){
     uint8_t channels[4];
     adc_read_all(channels);
 
@@ -20,12 +20,10 @@ void send_iodata(void){
 
 	print_joystick_position(pos);
 
-	buttonState button_state = button_read((Button){.right = true, .left = false, .number = 5});
-
 	CanMessage message = {
 		.id = 0x123,
-		.length = 3,
-		.data = {pos.x, pos.y, button_state}
+		.length = 2,
+		.data = {pos.x, pos.y}
 	};
 
 	can_send(&message);
@@ -51,7 +49,7 @@ int main() {
 	can_test();
 
 	while(1){
-		send_iodata();
+		send_joystick_pos();
 	}
 
 }

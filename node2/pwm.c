@@ -82,7 +82,7 @@ uint32_t joystickpos_to_pulse(uint8_t pos)
 }
 
 void pwm_pulse_from_controller(CanMsg *message){
-    uint8_t ypos = message.byte[1];
+    uint8_t ypos = message->byte[1];
     uint8_t ypos_scaled = 2.222*ypos;
     pwm_set_pulse_us(joystickpos_to_pulse(ypos_scaled));
     printf("ypos: %u\n", (unsigned int)ypos_scaled);

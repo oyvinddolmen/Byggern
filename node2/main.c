@@ -17,6 +17,7 @@
 #include "can.h"
 #include "diode.h"
 #include "game.h"
+#include "solenoid.h"
 
 void update_from_message(void){
     CanMsg message;

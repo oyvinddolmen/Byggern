@@ -1,4 +1,4 @@
-#include "soleniod.h"
+#include "solenoid.h"
 #include "sam.h"
 #include "time.h"
 #include <stdbool.h>
