@@ -214,8 +214,7 @@ JoystickInput poll_joystick(void)
     if (joystick.btn != 0) raw = SELECT;
     else if (direction.UP) raw = UP;
     else if (direction.DOWN) raw = DOWN;
-    else if (direction.LEFT) raw = LEFT;
-    else if (direction.RIGHT) raw = RIGHT;
+    // Ignore LEFT/RIGHT so X-axis drift cannot block navigation.
 
     if (raw != candidate) {
         candidate = raw;
