@@ -45,6 +45,23 @@ int main(void)
         if (can_ready && menu_game_running()) {
             send_iodata();
         }
+
+        CanMessage message;
+        if (can_ready && can_receive(&message) &&
+            message.id == 0x13 &&
+            message.length == 1 &&
+            message.data[0] == 0xFF) {
+            menu_game_over();
+            
+            CanMessage game_over_message = {
+                .id = 0x12,
+                .length = 3,
+                .data = {50, 50, BTN_NONE}
+            };
+            can_send(&game_over_message);
+        }
+
         _delay_ms(10);
+
     }
 }

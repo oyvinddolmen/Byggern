@@ -136,7 +136,7 @@ uint32_t menu_game_seconds(void)
 
 /* Call from the main loop when a game-over event is received. */
 void menu_game_over(void)
-{
+{    
     if (!menu_game_running()) return;
     final_seconds = game_timer_seconds();
     current_menu = &game_over_menu;

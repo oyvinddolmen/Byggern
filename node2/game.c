@@ -3,6 +3,8 @@
 #include "game.h"
 #include "diode.h"
 #include "can.h"
+#include "solenoid.h"
+#include "pwm.h"
 
 static bool beam_blocked = false;
 
@@ -40,7 +42,6 @@ void check_game_over(uint16_t adc_value)
 void run_game(void)
 {
     beam_blocked = false;
-    diode_init(7); // Initialize ADC channel 7 (A0)
 
 
     while (1)
