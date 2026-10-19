@@ -38,15 +38,17 @@ int main()
     can_init(timing, 0);
     adc_init(7); // Initialize ADC channel 7 (A0)
     encoder_init();
+    motor_init();
 
     while (1)
     {
-        pwm_pulse_from_controller();
 
         score_update(adc_read());
         //printf("Score: %d\n", score_get());
 
         int32_t position = encoder_read();
         //printf("Encoder position: %ld\n", (long)position);
+
+        controller_update();
     }
 }

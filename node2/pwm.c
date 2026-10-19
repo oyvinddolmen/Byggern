@@ -21,10 +21,14 @@
 #define SERVO_PWM_MASK     (1u << SERVO_PWM_CHANNEL)
 #define SERVO_PIN_MASK     (1u << 13)
 
+
+
+/* ------------------ SERVO --------------------- */
+
 void pwm_init(void)
 {
     // 1. Aktiver periferiklokkene til PIOB og PWM.
-    PMC->PMC_PCER0 = (1u << ID_PIOB);
+    PWM->PWM_CLK = PWM_CLK_PREA(0) | PWM_CLK_DIVA(84);
     PMC->PMC_PCER1 = (1u << (ID_PWM - 32u));
 
     // 2. Deaktiver PWM-kanal 1 under konfigureringen.
@@ -56,6 +60,7 @@ void pwm_init(void)
     PWM->PWM_ENA = SERVO_PWM_MASK;
 }
 
+
 void pwm_set_pulse_us(uint32_t pulse_us)
 {
     // Hold pulsen innenfor servoens gyldige område.
@@ -81,16 +86,102 @@ uint32_t joystickpos_to_pulse(uint8_t pos)
     return 900u + (uint32_t)pos * 12u;
 }
 
-void pwm_pulse_from_controller(void){
+// void pwm_pulse_from_controller(void){
 
-    CanMsg message;
+//     CanMsg message;
     
-    bool recieved = can_rx(&message);
-    if (recieved){
-        uint8_t ypos = message.byte[1];
-        uint8_t ypos_scaled = 2.222*ypos;
-        pwm_set_pulse_us(joystickpos_to_pulse(ypos_scaled));
-        printf("ypos: %u\n", (unsigned int)ypos_scaled);
-    };
+//     bool recieved = can_rx(&message);
+//     if (recieved){
+//         printf("Byte 0: %u, Byte 1: %u\n",
+//                (unsigned int)message.byte[0],
+//                (unsigned int)message.byte[1]);
+
+//         uint8_t ypos = message.byte[1];
+//         pwm_set_pulse_us(joystickpos_to_pulse(ypos));
+//     };
+// }
+
+
+/* ------------------ MOTOR --------------------- */
+#include "sam.h"
+#include <stdint.h>
+
+#define MOTOR_PWM_MAX 100
+
+void motor_init(void)
+{
+
+    // Enable clocks for PIOB, PIOC and PWM.
+    PMC->PMC_PCER0 = (1u << ID_PIOB) |
+                     (1u << ID_PIOC);
+
+    PMC->PMC_PCER1 = (1u << (ID_PWM - 32u));
+
+    // Configure PC23 as GPIO output for motor direction.
+    PIOC->PIO_PER = (1u << 23);
+    PIOC->PIO_OER = (1u << 23);
+    PIOC->PIO_CODR = (1u << 23);
+
+    // Assign PB12 to PWM peripheral B (motor ENABLE).
+    PIOB->PIO_ABSR |= (1u << 12);
+    PIOB->PIO_PDR = (1u << 12);
+
+    // Configure PWM channel 0, preserving the shared PWM clock.
+    PWM->PWM_DIS = PWM_DIS_CHID0;
+
+    PWM->PWM_CH_NUM[0].PWM_CMR = PWM_CMR_CPRE_CLKA;
+    PWM->PWM_CH_NUM[0].PWM_CPRD = 1000u;
+    PWM->PWM_CH_NUM[0].PWM_CDTY = 0u;
+
+    // Enable motor PWM channel.
+    PWM->PWM_ENA = PWM_ENA_CHID0;
 }
 
+void motor_set_x(uint8_t x)
+{
+    if (x > 100)
+        x = 100;
+
+    uint32_t duty;
+
+    if (x >= 20 && x <= 80)
+    {
+        duty = 0;
+    }
+    else if (x < 50)
+    {
+        PIOC->PIO_CODR = (1u << 23);  // PHASE low
+        duty = (uint32_t)(50 - x) * 20u;
+    }
+    else
+    {
+        PIOC->PIO_SODR = (1u << 23);  // PHASE high
+        duty = (uint32_t)(x - 50) * 20u;
+    }
+
+    PWM->PWM_CH_NUM[0].PWM_CDTYUPD = duty;
+
+    printf("X=%u, duty=%lu\n",
+           (unsigned int)x,
+           (unsigned long)duty);
+}
+
+
+
+
+void controller_update(void)
+{
+    CanMsg message;
+
+    if (can_rx(&message))
+    {
+        uint8_t xpos = message.byte[0];
+        uint8_t ypos = message.byte[1];
+
+        // Y-axis controls the servo.
+        pwm_set_pulse_us(joystickpos_to_pulse(ypos));
+
+        // X-axis controls the motor.
+        motor_set_x(xpos);
+    }
+}
