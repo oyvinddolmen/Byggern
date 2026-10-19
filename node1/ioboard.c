@@ -235,3 +235,34 @@ JoystickInput poll_joystick(void)
     }
     return JOYSTICK_NONE;
 }
+
+ButtonState button_read(Button button) {
+    ButtonState state = BTN_NONE;
+    spi_slave_select(IOBOARD);
+
+    // Button command
+    spi_transfer_byte(0x04);
+
+    // Required delay between command and first result
+    _delay_us(40);
+
+    // Read button states
+    uint8_t button_states_right = spi_transfer_byte(0xFF);
+    _delay_us(2);
+    uint8_t button_states_left = spi_transfer_byte(0xFF);
+
+    spi_slave_select(NONE);
+
+    // Check the state of the specified button
+    if (button.right) {
+        if (button.number < 7) {
+            state = (button_states_right & (1 << button.number)) ? PRESSED : BTN_NONE;
+        }
+    } else {
+        if (button.number < 8) {
+            state = (button_states_left & (1 << button.number)) ? PRESSED : BTN_NONE;
+        }
+    }
+
+    return state;
+}

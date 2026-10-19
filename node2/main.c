@@ -18,6 +18,22 @@
  * If you get errors such as "arm-none-eabi-gcc: no such file", you may need to reinstall the arm gcc packages using
  * apt or your favorite package manager.
  */
+#include "uart.h"
+#include "can.h"
+#include "diode.h"
+#include "game.h"
+#include "solenoid.h"
+
+void update_from_message(void){
+    CanMsg message;
+    bool received = can_rx(&message);
+    if (received){
+        if (message.id == 0x12 && message.length == 3){
+            soleniod_activate(&message);
+            pwm_pulse_from_controller(&message);
+        }
+    }
+}
 
 int main()
 {
@@ -41,10 +57,14 @@ int main()
     encoder_init();
     motor_init();
     motor_set_x(50);
+    soleniod_init();
+
 
     while (1)
     {
-        pwm_pulse_from_controller();
+
+        update_from_message();
+        soleniod_update();
 
         score_update(adc_read());
         //printf("Score: %d\n", score_get());
@@ -52,6 +72,6 @@ int main()
         int32_t position = encoder_read();
         //printf("Encoder position: %ld\n", (long)position);
 
-        controller_update();    // sets motor and servo based on CAN messages
+        //controller_update();    // sets motor and servo based on CAN messages
     }
 }

@@ -15,6 +15,8 @@ SOURCE_FILES = \
 	game.c \
 	encoder.c \
 	motor.c \
+	solenoid.c \
+	time.c \
 #   filename2.c \
 #	filenameN.c
 
