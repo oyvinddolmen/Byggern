@@ -40,6 +40,17 @@ typedef struct {
     uint8_t btn;
 } JoystickData;
 
+tydedef struct {
+    bool right;
+    bool left;
+    uint8_t number;
+} Button;
+
+typedef enum {
+    PRESSED,
+    NONE
+} ButtonState;
+
 
 void ioboard_init(void);
 
