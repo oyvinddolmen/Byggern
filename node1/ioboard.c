@@ -201,11 +201,16 @@ JoystickData joystick_read(void) {
 
 JoystickInput poll_joystick(void)
 {
+    uint8_t channels[4];
+    adc_read_all(channels);
+
     JoystickData joystick = joystick_read();
-    JoystickDirections direction = joystick_direction(joystick.x, joystick.y);
+
+    JoystickDirections direction =
+        joystick_direction(channels[0], channels[1]);
+
     JoystickInput raw = JOYSTICK_NONE;
 
-    /* SPI btn polarity: assumes nonzero means pressed; verify on hardware. */
     if (joystick.btn != 0) raw = SELECT;
     else if (direction.UP) raw = UP;
     else if (direction.DOWN) raw = DOWN;
