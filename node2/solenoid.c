@@ -8,6 +8,8 @@
 #define PULSE_MS 50u
 
 static bool was_pressed;
+static bool active;
+static uint64_t pulse_end;
 
 void soleniod_init(void)
 {
@@ -26,17 +28,23 @@ void soleniod_init(void)
 void soleniod_activate(CanMsg *message)
 {
     if (message == NULL || message->length != 3) return;
-
-    // Node1 sends {x, y, button_state}: PRESSED = 1, NONE = 0.
     if (message->byte[2] > 1u) return;
+
     bool pressed = (message->byte[2] == 1u);
 
-    if (pressed && !was_pressed) {
-        PIOB->PIO_CODR = SOLENIOD_PIN;
-        time_spinFor(msecs(PULSE_MS));
-        PIOB->PIO_SODR = SOLENIOD_PIN;
+    if (pressed && !was_pressed && !active) {
+        pulse_end = time_now() + msecs(PULSE_MS);
+        active = true;
+        PIOB->PIO_CODR = SOLENIOD_PIN;  // ON
     }
 
-    // Require a release before another pulse.
     was_pressed = pressed;
+}
+
+void soleniod_update(void)
+{
+    if (active && time_now() >= pulse_end) {
+        PIOB->PIO_SODR = SOLENIOD_PIN;  // OFF
+        active = false;
+    }
 }

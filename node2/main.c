@@ -55,6 +55,7 @@ int main()
     while (1)
     {
         update_from_message();
+        soleniod_update();
 
         score_update(adc_read());
         //printf("Score: %d\n", score_get());
