@@ -77,7 +77,7 @@ uint32_t joystickpos_to_pulse(uint8_t pos)
     if (pos > 100u) {
         pos = 100u;
     }
-
+    printf("%u\n", (uint32_t)pos);
     return 900u + (uint32_t)pos * 12u;
 }
 
@@ -87,8 +87,10 @@ void pwm_pulse_from_controller(void){
     
     bool recieved = can_rx(&message);
     if (recieved){
-        uint8_t xpos = message.byte[0];
-        pwm_set_pulse_us(joystickpos_to_pulse(xpos));
+        uint8_t ypos = message.byte[1];
+        uint8_t ypos_scaled = 2.222*ypos;
+        pwm_set_pulse_us(joystickpos_to_pulse(ypos_scaled));
+        printf("ypos: %u\n", (unsigned int)ypos_scaled);
     };
 }
 

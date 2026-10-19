@@ -13,6 +13,7 @@ SOURCE_FILES = \
 	pwm.c \
 	diode.c \
 	game.c \
+	encoder.c \
 #   filename2.c \
 #	filenameN.c
 

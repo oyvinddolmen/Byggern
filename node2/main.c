@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include "sam.h"
 #include "pwm.h"
+#include "encoder.h"
 
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
@@ -36,16 +37,16 @@ int main()
 
     can_init(timing, 0);
     adc_init(7); // Initialize ADC channel 7 (A0)
+    encoder_init();
 
     while (1)
     {
-        CanMsg message;
-        bool recieved = can_rx(&message);
-        if (recieved){
-        };
         pwm_pulse_from_controller();
 
         score_update(adc_read());
-        printf("Score: %d\n", score_get());
+        //printf("Score: %d\n", score_get());
+
+        int32_t position = encoder_read();
+        //printf("Encoder position: %ld\n", (long)position);
     }
 }
