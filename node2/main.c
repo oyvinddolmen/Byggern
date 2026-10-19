@@ -50,6 +50,7 @@ int main()
     can_init(timing, 0);
     adc_init(7); // Initialize ADC channel 7 (A0)
     encoder_init();
+    soleniod_init();
 
     while (1)
     {

@@ -29,7 +29,7 @@ void soleniod_activate(CanMsg *message)
 
     // Node1 sends {x, y, button_state}: PRESSED = 1, NONE = 0.
     if (message->byte[2] > 1u) return;
-    bool pressed = (message->byte[2] == 0u);
+    bool pressed = (message->byte[2] == 1u);
 
     if (pressed && !was_pressed) {
         PIOB->PIO_CODR = SOLENIOD_PIN;

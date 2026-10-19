@@ -237,7 +237,7 @@ JoystickInput poll_joystick(void)
 }
 
 ButtonState button_read(Button button) {
-    ButtonState state = NONE;
+    ButtonState state = BTN_NONE;
     spi_slave_select(IOBOARD);
 
     // Button command
@@ -256,11 +256,11 @@ ButtonState button_read(Button button) {
     // Check the state of the specified button
     if (button.right) {
         if (button.number < 7) {
-            state = (button_states_right & (1 << button.number)) ? PRESSED : NONE;
+            state = (button_states_right & (1 << button.number)) ? PRESSED : BTN_NONE;
         }
     } else {
         if (button.number < 8) {
-            state = (button_states_left & (1 << button.number)) ? PRESSED : NONE;
+            state = (button_states_left & (1 << button.number)) ? PRESSED : BTN_NONE;
         }
     }
 

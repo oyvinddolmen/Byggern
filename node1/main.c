@@ -49,7 +49,6 @@ int main() {
 	
 	can_init();
 	can_test();
-	soleniod_init();
 
 	while(1){
 		send_iodata();
