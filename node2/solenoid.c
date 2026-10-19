@@ -33,7 +33,7 @@ void soleniod_activate(CanMsg *message)
 
     if (pressed && !was_pressed) {
         PIOB->PIO_CODR = SOLENIOD_PIN;
-        _delay_ms(PULSE_MS);
+        time_spinFor(msecs(PULSE_MS));
         PIOB->PIO_SODR = SOLENIOD_PIN;
     }
 
