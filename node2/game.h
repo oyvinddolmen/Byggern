@@ -1,12 +1,11 @@
-#ifndef SCORE_H
-#define SCORE_H
+#ifndef GAME_H
+#define GAME_H
 
 #include <stdint.h>
 
-void score_update(uint16_t adc_value);
-uint16_t score_get(void);
-void score_reset(void);
-
+void update_from_message(void);
+void send_game_over(void);
+void check_game_over(uint16_t adc_value);
 void run_game(void);
 
 #endif
