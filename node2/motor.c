@@ -174,5 +174,5 @@ void motor_set_x_pid(uint8_t x, int32_t left,
     if (pid_output > 100.0f) pid_output = 100.0f;
     if (pid_output < -100.0f) pid_output = -100.0f;
     
-    motor_set_speed((uint16_t)pid_output);
+    motor_set_speed((int16_t)pid_output);
 }
