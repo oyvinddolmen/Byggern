@@ -1,35 +1,32 @@
 #include "pid.h"
 
-static float dt = 0.01f; // Default time step in seconds.
-static float integral = 0.0f;
-static float derivative = 0.0f;
-static float proportional = 0.0f;
+PID pid = { .kp = 50.0f, .ki = 5.0f, .kd = 25.0f, .integral = 0.0f, .previous_error = 0.0f , .dt = 1f}; // Initialize PID with default values and dt
 
 
-void pid_reset(PID *pid)
+void pid_reset(void)
 {
-    pid->integral = 0.0f;
-    pid->previous_error = 0.0f;
+    pid.integral = 0.0f;
+    pid.previous_error = 0.0f;
 }
 
-float pid_update(PID *pid, float target, float position)
+float pid_update(float target, float position)
 {
     float error = target - position;
 
     // Proportional term
-    proportional = pid->kp * error;
+    float proportional = pid.kp * error;
 
     // Integral term
-    integral += pid->ki * error * dt;
+    pid.integral += pid.ki * error * pid.dt;
 
     // Derivative term
-    derivative = pid->kd * (error - pid->previous_error) / dt;
+    float derivative = pid.kd * (error - pid.previous_error) / pid.dt;
 
     // Update previous error
-    pid->previous_error = error;
+    pid.previous_error = error;
 
     // Calculate the control output
-    float output = proportional + integral + derivative;
+    float output = proportional + pid.integral + derivative;
 
-
+    return output;
 }

@@ -68,7 +68,7 @@ void motor_set_x(uint8_t x)
         duty = (magnitude - MOTOR_DEADZONE) * MOTOR_PWM_PERIOD /
                (MOTOR_CENTRE - MOTOR_DEADZONE);
     }
-    duty = duty*0.3;
+    duty = duty*0.8;
 
     /* Applied at the next PWM period boundary, within 50 us. */
     PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD = duty;
@@ -80,7 +80,10 @@ void motor_set_x(uint8_t x)
 void motor_set_x_pid(uint8_t x, int32_t left,
                      int32_t right)
 {
-
+    int position = encoder_read_position(left, right);
+    float pid_output = pid_update(x, position);
+    
+    motor_set_x((uint8_t)pid_output);
 }
 
 #include <stdbool.h>
