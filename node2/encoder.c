@@ -50,13 +50,9 @@ int32_t encoder_read(void)
 
 int32_t encoder_read_position(int32_t left_limit, int32_t right_limit)
 {
-    int32_t range = left_limit - right_limit;
-    if (range == 0 || range < 0) {
-        return 0; // Avoid division by zero or invalid range
-    }
+    if (left_limit == right_limit) return 0;
 
-    float position = 100.0f * ((float)encoder_read() - (float)right_limit) /
-                     ((float)right_limit - (float)left_limit);
-
-    return (int32_t)position;
+    return (int32_t)(
+        100.0f * ((float)encoder_read() - (float)left_limit) /
+        ((float)right_limit - (float)left_limit));
 }

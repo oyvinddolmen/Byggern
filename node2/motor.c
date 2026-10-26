@@ -170,6 +170,9 @@ void motor_set_x_pid(uint8_t x, int32_t left,
 {
     int position = encoder_read_position(left, right);
     float pid_output = pid_update(x, position);
+
+    if (pid_output > 100.0f) pid_output = 100.0f;
+    if (pid_output < -100.0f) pid_output = -100.0f;
     
     motor_set_speed((uint16_t)pid_output);
 }
