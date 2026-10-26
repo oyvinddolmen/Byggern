@@ -18,6 +18,7 @@ SOURCE_FILES = \
 	solenoid.c \
 	time.c \
 	pid.c \
+	filtering.c \
 #   filename2.c \
 #	filenameN.c
 

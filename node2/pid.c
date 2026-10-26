@@ -1,6 +1,7 @@
 #include "pid.h"
+#include <stdio.h>
 
-PID pid = { .kp = 1.0f, .ki = 0.0f, .kd = 0.0f, .integral = 0.0f, .previous_error = 0.0f , .dt = 0.01f}; // Initialize PID with default values and dt
+PID pid = { .kp = 1.5f, .ki = 0.0f, .kd = 0.0f, .integral = 0.0f, .previous_error = 0.0f , .dt = 0.01f}; // Initialize PID with default values and dt
 
 
 void pid_reset(void)
@@ -27,6 +28,6 @@ float pid_update(float target, float position)
 
     // Calculate the control output
     float output = proportional + pid.integral + derivative;
-
+    printf("PID output: %f\n", output); // Debugging: print the PID output
     return output;
 }
