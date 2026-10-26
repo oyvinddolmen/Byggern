@@ -57,7 +57,7 @@ void run_game(void)
     {
         
         update_from_message(&target_position);
-        soleniod_update();
+        solenoid_update();
         motor_set_x_pid((uint8_t)target_position, limits.left, limits.right);
         
 
