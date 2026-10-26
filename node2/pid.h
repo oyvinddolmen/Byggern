@@ -10,9 +10,8 @@ typedef struct {
 
 void pid_reset(void);
 
-/* target and position use the same units; dt is seconds.
- * Returns -50..50 for motor_set_x(50 + output).
- */
+/* target and position use the same units; dt is seconds. The output is
+ * recalculated at dt intervals and held between updates. */
 float pid_update(float target, float position);
 
 #endif
