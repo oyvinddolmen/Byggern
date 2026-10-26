@@ -55,7 +55,8 @@ int32_t encoder_read_position(int32_t left_limit, int32_t right_limit)
         return 0; // Avoid division by zero or invalid range
     }
 
-    int32_t position = (100 * (float)encoder_read()) / (float)range;
+    float position = 100.0f * ((float)encoder_read() - (float)right_limit) /
+                     ((float)right_limit - (float)left_limit);
 
-    return position;
+    return (int32_t)position;
 }

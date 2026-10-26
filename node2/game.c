@@ -11,13 +11,13 @@
 static bool beam_blocked = false;
 
 
-void update_from_message(float *target_position){
+void update_from_message(void){
     CanMsg message;
     bool received = can_rx(&message);
     if (received){
         if (message.id == 0x12 && message.length == 3){
             soleniod_activate(&message);
-            *target_position = (float)message.byte[0]; // Update target position based on received message
+            pwm_pulse_from_controller(&message);
         }
     }
 }
@@ -46,13 +46,15 @@ void run_game(void)
 {
     beam_blocked = false;
     MotorLimits limits = motor_find_limits();
+    float target_position = 50.0f; // Default target position (center)
 
     while (1)
     {
-        float target_position = 50.0f; // Default target position (center)
-        update_from_message(&target_position);
+        
+        update_from_message();
         soleniod_update();
         motor_set_x_pid((uint8_t)target_position, limits.left, limits.right);
+        
 
         check_game_over(adc_read());
     }

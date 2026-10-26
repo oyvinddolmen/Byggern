@@ -1,6 +1,6 @@
 #include "pid.h"
 
-PID pid = { .kp = 50.0f, .ki = 5.0f, .kd = 25.0f, .integral = 0.0f, .previous_error = 0.0f , .dt = 1f}; // Initialize PID with default values and dt
+PID pid = { .kp = 1.0f, .ki = 0.0f, .kd = 0.0f, .integral = 0.0f, .previous_error = 0.0f , .dt = 0.01f}; // Initialize PID with default values and dt
 
 
 void pid_reset(void)

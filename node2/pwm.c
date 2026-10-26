@@ -88,7 +88,7 @@ uint32_t joystickpos_to_pulse(uint8_t pos)
 }
 
 
-void pwm_pulse_from_controller(CanMsg *message, MotorLimits limits)
+void pwm_pulse_from_controller(CanMsg *message)
 {
     uint8_t xpos = message->byte[0];
     uint8_t ypos = message->byte[1];

@@ -77,14 +77,7 @@ void motor_set_x(uint8_t x)
 #include "pid.h"
 #include "encoder.h"
 
-void motor_set_x_pid(uint8_t x, int32_t left,
-                     int32_t right)
-{
-    int position = encoder_read_position(left, right);
-    float pid_output = pid_update(x, position);
-    
-    motor_set_x((uint8_t)pid_output);
-}
+
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -170,4 +163,13 @@ void motor_set_speed(int16_t speed)
 
     PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD =
         magnitude * MOTOR_PWM_PERIOD / 100u;
+}
+
+void motor_set_x_pid(uint8_t x, int32_t left,
+                     int32_t right)
+{
+    int position = encoder_read_position(left, right);
+    float pid_output = pid_update(x, position);
+    
+    motor_set_speed((uint16_t)pid_output);
 }
