@@ -78,7 +78,7 @@ void motor_set_x(uint8_t x)
 #include "encoder.h"
 
 void motor_set_x_pid(uint8_t x, int32_t left,
-                     int32_t right, float dt)
+                     int32_t right)
 {
 
 }
