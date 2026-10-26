@@ -80,23 +80,7 @@ void motor_set_x(uint8_t x)
 void motor_set_x_pid(uint8_t x, int32_t left,
                      int32_t right, float dt)
 {
-    static PID pid = {.kp = 1.0f};
 
-    if (left == right || dt <= 0.0f) {
-        pid_reset(&pid);
-        motor_set_speed(0);
-        return;
-    }
-
-    if (x > 100) x = 100;
-
-    float position =
-        100.0f * ((float)encoder_read() - (float)left) /
-        ((float)right - (float)left);
-
-    float output = pid_update(&pid, (float)x, position, dt);
-
-    motor_set_speed((int16_t)output);
 }
 
 #include <stdbool.h>

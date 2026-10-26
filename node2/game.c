@@ -5,6 +5,8 @@
 #include "can.h"
 #include "solenoid.h"
 #include "pwm.h"
+#include <stdio.h>
+#include "motor.h"
 
 static bool beam_blocked = false;
 
@@ -44,7 +46,7 @@ void check_game_over(uint16_t adc_value)
 void run_game(void)
 {
     beam_blocked = false;
-
+    MotorLimits limits = motor_find_limits();
 
     while (1)
     {

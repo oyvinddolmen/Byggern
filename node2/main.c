@@ -48,5 +48,7 @@ int main()
     encoder_init();
     soleniod_init();
 
+    
+
     run_game();
 }
