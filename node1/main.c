@@ -17,11 +17,7 @@ void send_iodata(void){
     adc_read_all(channels);
 
     Position pos = joystick_position(channels[0], channels[1]);
-
-
-
 	ButtonState button_state = button_read((Button){.right = true, .left = false, .number = 5});
-
 	CanMessage message = {
 		.id = 0x12,
 		.length = 3,

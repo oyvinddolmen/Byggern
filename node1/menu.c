@@ -35,7 +35,6 @@ static MenuItem difficulty_items[] = {
         &main_menu
     };
 
-    //Main
 
 static MenuItem main_items[] = {
         {"Start Game", MENU_ACTION, .action = start_game},

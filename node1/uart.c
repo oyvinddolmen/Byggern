@@ -4,11 +4,11 @@
 
 void uart_init(unsigned int ubrr) {
 	// setter BAUD rate
-	// lagre de 8 første bits i UBRR0High registeret. 8 siste i LOW
+	// lagre de 8 fÃ¸rste bits i UBRR0High registeret. 8 siste i LOW
 	UBRR0H = (unsigned char)(ubrr>>8);
 	UBRR0L = (unsigned char)ubrr;
 	
-	// enabler både receiver og transmitter
+	// enabler bÃ¥de receiver og transmitter
 	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
 	
 	/* Set frame format: 8data, 2stop bit */
@@ -19,7 +19,7 @@ void uart_init(unsigned int ubrr) {
 }
 
 int uart_send(char data, FILE *stream) {
-	// vent på tomt buffer. UDRE0 usart data register empty
+	// vent pÃ¥ tomt buffer. UDRE0 usart data register empty
 	while( !(UCSR0A & (1 << UDRE0))) {
 		// vent
 	}
@@ -29,7 +29,7 @@ int uart_send(char data, FILE *stream) {
 }
 
 char uart_receive(FILE *stream) {
-	// vent på data
+	// vent pÃ¥ data
 	while (!(UCSR0A & (1 << RXC0))) {
 		// vent
 	}

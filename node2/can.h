@@ -23,7 +23,6 @@ __attribute__((packed)) struct CanInit {
 
 // Initialize CAN bus, with bit timings and optional interrupt
 // If `rxInterrupt` is not 0, an interrupt will be triggered when a message is received.
-// (See can.c for an example interrupt handler)
 // Example:
 //    can_init((CanInit){.brp = F_CPU/2000000-1, .phase1 = 5, .phase2 = 1, .propag = 6}, 0);
 void can_init(CanInit init, uint8_t rxInterrupt);

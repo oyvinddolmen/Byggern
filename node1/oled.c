@@ -6,11 +6,11 @@
 void oled_init(void)
 {
     // fra 
-    oled_write_command(0xae); // display off
+    oled_write_command(0xae); //display off
     oled_write_command(0xa1); //segment remap
     oled_write_command(0xda); //common pads hardware: alternative
     oled_write_command(0x12);
-    oled_write_command(0xc8); //common output scan direction:com63~com0
+    oled_write_command(0xc8); 
     oled_write_command(0xa8); //multiplex ration mode:63
     oled_write_command(0x3f);
     oled_write_command(0xd5); //display divide ratio/osc. freq. mode
@@ -25,7 +25,7 @@ void oled_init(void)
     oled_write_command(0x34);
     oled_write_command(0xa4); //out follows RAM content
     oled_write_command(0xa6); //set normal display
-    oled_write_command(0xaf); // display on
+    oled_write_command(0xaf); //display on
 }
 
 void oled_reset(void)
@@ -115,8 +115,7 @@ void oled_pos(uint8_t row, uint8_t column)
 
 void oled_write_char(char c)
 {
-    // Font table contains printable ASCII characters:
-    // ASCII 32 (' ') to ASCII 126 ('~')
+    // Font table contains printable ASCII characters: ASCII to ASCII 126 
     if (c < 32 || c > 126)
     {
         c = '?';

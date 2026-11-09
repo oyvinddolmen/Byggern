@@ -128,7 +128,7 @@ void can_test(void)
         return;
     }
 
-    // lager meldingenog sender
+    // lager meldingen og sender
     const CanMessage sent = {.id = 0x21, .length = 2, .data = {0xAA, 0xBB}};
     if (!can_send(&sent)) {
         printf("CAN send failed\n");

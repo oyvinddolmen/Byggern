@@ -4,7 +4,7 @@
 #include <util/delay.h>
 #include "ioboard.h"
 
-// Dead zone measured in ADC counts. Adjust as needed.
+// Dead zone measured in ADC counts
 #define JOYSTICK_DEADZONE 12
 
 typedef struct {
