@@ -68,7 +68,7 @@ void motor_set_x(uint8_t x)
         duty = (magnitude - MOTOR_DEADZONE) * MOTOR_PWM_PERIOD /
                (MOTOR_CENTRE - MOTOR_DEADZONE);
     }
-    duty = duty*0.3;
+    duty = duty*0.8;
 
     /* Applied at the next PWM period boundary, within 50 us. */
     PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD = duty;
@@ -77,27 +77,7 @@ void motor_set_x(uint8_t x)
 #include "pid.h"
 #include "encoder.h"
 
-void motor_set_x_pid(uint8_t x, int32_t left,
-                     int32_t right, float dt)
-{
-    static PID pid = {.kp = 1.0f};
 
-    if (left == right || dt <= 0.0f) {
-        pid_reset(&pid);
-        motor_set_speed(0);
-        return;
-    }
-
-    if (x > 100) x = 100;
-
-    float position =
-        100.0f * ((float)encoder_read() - (float)left) /
-        ((float)right - (float)left);
-
-    float output = pid_update(&pid, (float)x, position, dt);
-
-    motor_set_speed((int16_t)output);
-}
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -183,4 +163,16 @@ void motor_set_speed(int16_t speed)
 
     PWM->PWM_CH_NUM[MOTOR_CHANNEL].PWM_CDTYUPD =
         magnitude * MOTOR_PWM_PERIOD / 100u;
+}
+
+void motor_set_x_pid(uint8_t x, int32_t left,
+                     int32_t right)
+{
+    int position = encoder_read_position(left, right);
+    float pid_output = pid_update(x, position);
+
+    if (pid_output > 100.0f) pid_output = 100.0f;
+    if (pid_output < -100.0f) pid_output = -100.0f;
+    
+    motor_set_speed((int16_t)pid_output);
 }

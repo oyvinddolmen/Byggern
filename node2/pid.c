@@ -1,30 +1,33 @@
 #include "pid.h"
+#include <stdio.h>
 
-void pid_reset(PID *pid)
+PID pid = { .kp = 1.5f, .ki = 0.0f, .kd = 0.0f, .integral = 0.0f, .previous_error = 0.0f , .dt = 0.01f}; // Initialize PID with default values and dt
+
+
+void pid_reset(void)
 {
-    pid->integral = 0.0f;
-    pid->previous_error = 0.0f;
+    pid.integral = 0.0f;
+    pid.previous_error = 0.0f;
 }
 
-float pid_update(PID *pid, float target, float position, float dt)
+float pid_update(float target, float position)
 {
-    if (dt <= 0.0f) return 0.0f;
-
     float error = target - position;
-    float integral = pid->integral + pid->ki * error * dt;
-    float derivative = (error - pid->previous_error) / dt;
-    float output = pid->kp * error + integral + pid->kd * derivative;
 
-    // Prevent integral windup; allow it to unwind during saturation.
-    if ((output >= -50.0f && output <= 50.0f) ||
-        (output > 50.0f && error < 0.0f) ||
-        (output < -50.0f && error > 0.0f)) {
-        pid->integral = integral;
-    }
+    // Proportional term
+    float proportional = pid.kp * error;
 
-    pid->previous_error = error;
+    // Integral term
+    pid.integral += pid.ki * error * pid.dt;
 
-    if (output > 50.0f) output = 50.0f;
-    if (output < -50.0f) output = -50.0f;
+    // Derivative term
+    float derivative = pid.kd * (error - pid.previous_error) / pid.dt;
+
+    // Update previous error
+    pid.previous_error = error;
+
+    // Calculate the control output
+    float output = proportional + pid.integral + derivative;
+    printf("PID output: %f\n", output); // Debugging: print the PID output
     return output;
 }
