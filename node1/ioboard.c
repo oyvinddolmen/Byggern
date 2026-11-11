@@ -4,7 +4,7 @@
 #include <util/delay.h>
 #include "ioboard.h"
 
-// Dead zone measured in ADC counts. Adjust as needed.
+// Dead zone measured in ADC counts
 #define JOYSTICK_DEADZONE 12
 
 typedef struct {
@@ -201,16 +201,20 @@ JoystickData joystick_read(void) {
 
 JoystickInput poll_joystick(void)
 {
+    uint8_t channels[4];
+    adc_read_all(channels);
+
     JoystickData joystick = joystick_read();
-    JoystickDirections direction = joystick_direction(joystick.x, joystick.y);
+
+    JoystickDirections direction =
+        joystick_direction(channels[0], channels[1]);
+
     JoystickInput raw = JOYSTICK_NONE;
 
-    /* SPI btn polarity: assumes nonzero means pressed; verify on hardware. */
     if (joystick.btn != 0) raw = SELECT;
     else if (direction.UP) raw = UP;
     else if (direction.DOWN) raw = DOWN;
-    else if (direction.LEFT) raw = LEFT;
-    else if (direction.RIGHT) raw = RIGHT;
+    // Ignore LEFT/RIGHT so X-axis drift cannot block navigation.
 
     if (raw != candidate) {
         candidate = raw;

@@ -11,7 +11,7 @@ static bool was_pressed;
 static bool active;
 static uint64_t pulse_end;
 
-void soleniod_init(void)
+void solenoid_init(void)
 {
     PMC->PMC_PCER0 = (1u << ID_PIOB);
 
@@ -25,7 +25,7 @@ void soleniod_init(void)
     was_pressed = false;
 }
 
-void soleniod_activate(CanMsg *message)
+void solenoid_activate(CanMsg *message)
 {
     if (message == NULL || message->length != 3) return;
     if (message->byte[2] > 1u) return;
@@ -41,7 +41,7 @@ void soleniod_activate(CanMsg *message)
     was_pressed = pressed;
 }
 
-void soleniod_update(void)
+void solenoid_update(void)
 {
     if (active && time_now() >= pulse_end) {
         PIOB->PIO_SODR = SOLENIOD_PIN;  // OFF

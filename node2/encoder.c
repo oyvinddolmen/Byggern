@@ -47,3 +47,12 @@ int32_t encoder_read(void)
 {
     return (int32_t)TC2->TC_CHANNEL[0].TC_CV;
 }
+
+int32_t encoder_read_position(int32_t left_limit, int32_t right_limit)
+{
+    if (left_limit == right_limit) return 0;
+
+    return (int32_t)(
+        100.0f * ((float)encoder_read() - (float)left_limit) /
+        ((float)right_limit - (float)left_limit));
+}

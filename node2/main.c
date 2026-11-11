@@ -14,9 +14,6 @@
 #include "solenoid.h"
 #include "time.h"
 
-#define CONTROL_PERIOD_MS 1000u
-#define CAN_TIMEOUT_MS 250u
-#define PRINT_PERIOD_MS 250u
 
 int main(void)
 {
@@ -41,69 +38,7 @@ int main(void)
 
     adc_init(7);
     encoder_init();
-    soleniod_init();
-    pid_reset();
+    solenoid_init();
 
-    uint8_t joystick_x = 50u;
-    bool have_can = false;
-    uint64_t last_can = time_now();
-    uint64_t last_control = time_now();
-    uint64_t last_print = time_now();
-
-    printf("Node 2: PID position control ready\n");
-
-    while (1)
-    {
-        CanMsg message;
-        uint64_t now = time_now();
-
-        
-        // A single CAN read supplies BOTH servo and position reference.
-        if (can_rx(&message)) {
-            if (message.id == 0x12u && message.length == 3u) {
-                joystick_x = message.byte[0];
-                uint8_t joystick_y = message.byte[1];
-
-                if (joystick_x > 100u) joystick_x = 100u;
-                if (joystick_y > 100u) joystick_y = 100u;
-
-                // Servo stays on joystick Y (900..2100 us).
-                pwm_set_pulse_us(900u + 12u * (uint32_t)joystick_y);
-
-                // Existing short, edge-triggered solenoid shot.
-                soleniod_activate(&message);
-
-                have_can = true;
-                last_can = now;
-            }
-        }
-
-        soleniod_update();
-        score_update(adc_read());
-
-        // Control step approximately every 10 ms; dt is measured, not guessed.
-        now = time_now();
-        if ((now - last_control) >= msecs(CONTROL_PERIOD_MS)) {
-            float dt = totalSeconds(now - last_control);
-            last_control = now;
-
-            if (!have_can || (now - last_can) > msecs(CAN_TIMEOUT_MS)) {
-                pid_reset();
-                motor_set_x(50); // CAN timeout or no first command
-                //printf("CAN timeout: stopping motor\n");
-            } else {
-                int32_t position = encoder_read();
-                uint8_t command = pid_update(joystick_x, position, dt);
-                printf("position=%ld, joystick_x=%u, command=%u\n",
-                   position, joystick_x, command);
-                motor_set_x(command);
-            }
-        }
-
-        if ((now - last_print) >= msecs(PRINT_PERIOD_MS)) {
-            last_print = now;
-        }
-
-
-    }
+    run_game();
 }
