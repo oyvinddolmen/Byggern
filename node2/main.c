@@ -24,6 +24,7 @@
 #include "game.h"
 #include "solenoid.h"
 
+MotorLimits limits;
 
 
 int main()
@@ -33,6 +34,7 @@ int main()
     motor_init();
     pwm_init();
     uart_init(840000000, 96000);
+    limits = motor_find_limits();
 
     CanInit timing = {
         .phase2 = 3,

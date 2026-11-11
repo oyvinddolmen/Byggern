@@ -93,7 +93,7 @@ void pwm_pulse_from_controller(CanMsg *message)
     uint8_t xpos = message->byte[0];
     uint8_t ypos = message->byte[1];
 
-    MotorLimits limits = motor_find_limits();
+    
 
 
     // Y-axis controls the servo.
@@ -101,5 +101,5 @@ void pwm_pulse_from_controller(CanMsg *message)
 
     // X-axis controls the motor.
     motor_set_x_pid(xpos, limits.left, limits.right, 0.01f);
-    
+
 }
