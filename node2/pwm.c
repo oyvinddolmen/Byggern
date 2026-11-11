@@ -99,7 +99,4 @@ void pwm_pulse_from_controller(CanMsg *message)
     // Y-axis controls the servo.
     pwm_set_pulse_us(joystickpos_to_pulse(ypos));
 
-    // X-axis controls the motor.
-    motor_set_x_pid(xpos, limits.left, limits.right, 0.01f);
-
 }
