@@ -1,102 +1,59 @@
-#include "PID.h"
-#include <stdbool.h>
+#include "pid.h"
+#include "time.h"
+#include <stdio.h>
 
-// IMPORTANT: Verify this number by moving the racket manually
-// from the known LEFT endpoint to the RIGHT endpoint.
-// It may be negative if encoder counts decrease towards the right.
-#define ENCODER_FULL_TRAVEL_COUNTS 2800
+PID pid = {.kp = 1.5f,
+           .ki = 5.0f,
+           .kd = 0.0f,
+           .integral = 0.0f,
+           .previous_error = 0.0f,
+           .dt = 0.01f}; // Initialize PID with default values and dt
 
-// Set to +1 when motor_set_x(>50) moves towards the right;
-// otherwise set to -1. Verify at low power before enabling PID.
-#define MOTOR_SIGN_FOR_RIGHT -1
+static uint64_t last_update;
+static float last_output;
+static int update_initialized;
 
-// Start with P control. Increase KI later if friction creates an offset.
-// KD is normally unnecessary for this lab (encoder differentiation is noisy).
-#define PID_KP 50f
-#define PID_KI 5f
-#define PID_KD 25f
-
-// Max change from motor_set_x(50), in command points.
-// Note that motor.c additionally applies its own deadzone and 0.3 scaling.
-#define MAX_COMMAND_OFFSET 30.0f
-#define INTEGRAL_LIMIT 150.0f
-#define POSITION_TOLERANCE 5.0f
-#define REFERENCE_MARGIN 10.0f
-
-static float integral = 0.0f;
-static float prev_position = 0.0f;
-static bool have_prev_position = false;
-
-static float limit(float value, float low, float high)
-{
-    if (value < low) return low;
-    if (value > high) return high;
-    return value;
+void pid_reset(void) {
+  pid.integral = 0.0f;
+  pid.previous_error = 0.0f;
+  last_update = 0;
+  last_output = 0.0f;
+  update_initialized = 0;
 }
 
-void pid_reset(void)
-{
-    integral = 0.0f;
-    prev_position = 0.0f;
-    have_prev_position = false;
-}
+float pid_update(float target, float position) {
+  uint64_t now = time_now();
+  uint64_t sample_period = msecs((uint64_t)(pid.dt * 1000.0f));
 
-uint8_t pid_update(uint8_t joystick_x, int32_t encoder_counts, float dt)
-{
-    if (ENCODER_FULL_TRAVEL_COUNTS == 0 || dt <= 0.0f || dt > 0.25f) {
-        pid_reset();
-        return 50u;
-    }
+  /* The main loop may call this much faster than the 100 Hz controller.
+   * Hold the previous output until a complete controller interval passes. */
+  if (update_initialized && (now - last_update) < sample_period) {
+    return last_output;
+  }
+  update_initialized = 1;
+  last_update = now;
 
-    // Convert encoder position to percent of calibrated travel.
-    // Do NOT clamp measured position: out-of-range measurements are
-    // important for detecting an attempted move beyond an endpoint.
-    float position = (100.0f * (float)encoder_counts) /
-                     (float)ENCODER_FULL_TRAVEL_COUNTS;
+  float error = target - position;
 
-    // Joystick directly supplies 0..100; no scaling is needed.
-    float reference = limit((float)joystick_x,
-                            REFERENCE_MARGIN, 100.0f - REFERENCE_MARGIN);
-    float error = reference - position;
+  // Proportional term
+  float proportional = pid.kp * error;
 
-    // Derivative on measurement avoids a large kick on reference changes.
-    float d_position = 0.0f;
-    if (have_prev_position) {
-        d_position = (position - prev_position) / dt;
-    }
-    prev_position = position;
-    have_prev_position = true;
+  // Integral term
+  pid.integral += pid.ki * error * pid.dt;
 
-    if (error > -POSITION_TOLERANCE && error < POSITION_TOLERANCE) {
-        integral = 0.0f;
-        return 50u;
-    }
+  /* Bound the integral contribution to avoid windup during saturation. */
+  if (pid.integral > 100.0f)
+    pid.integral = 100.0f;
+  if (pid.integral < -100.0f)
+    pid.integral = -100.0f;
 
-    // Candidate integral and output for simple conditional anti-windup.
-    float candidate_integral = limit(integral + error * dt,
-                                     -INTEGRAL_LIMIT, INTEGRAL_LIMIT);
-    float candidate_u = PID_KP * error + PID_KI * candidate_integral
-                        - PID_KD * d_position;
+  // Derivative term
+  float derivative = pid.kd * (error - pid.previous_error) / pid.dt;
 
-    if (!((candidate_u > MAX_COMMAND_OFFSET && error > 0.0f) ||
-          (candidate_u < -MAX_COMMAND_OFFSET && error < 0.0f))) {
-        integral = candidate_integral;
-    }
+  // Update previous error
+  pid.previous_error = error;
 
-    float u = PID_KP * error + PID_KI * integral - PID_KD * d_position;
-    u = limit(u, -MAX_COMMAND_OFFSET, MAX_COMMAND_OFFSET);
-
-    // Software endpoint protection (only valid with verified calibration).
-    if ((position <= 0.0f && u < 0.0f) ||
-        (position >= 100.0f && u > 0.0f)) {
-        pid_reset();
-        return 50u;
-    }
-
-    // motor_set_x() expects 0..100, center 50 = stop.
-    float offset = (float)MOTOR_SIGN_FOR_RIGHT * u;
-    int32_t command = 50 + (int32_t)(offset + (offset >= 0.0f ? 0.5f : -0.5f));
-    if (command < 0) command = 0;
-    if (command > 100) command = 100;
-    return (uint8_t)command;
+  // Calculate the control output
+  last_output = proportional + pid.integral + derivative;
+  return last_output;
 }
