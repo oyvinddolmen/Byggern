@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 uint64_t calib;
-static uint64_t now = 0;
+static volatile uint64_t now = 0;
 
 __attribute__((constructor)) void time_init(void) {
   // Clock calibration is set to '(num cycles for 1ms) / 8'
@@ -26,7 +26,18 @@ __attribute__((constructor)) void time_init(void) {
 
 void SysTick_Handler(void) { now += calib; }
 
-uint64_t time_now(void) { return now + calib - SysTick->VAL; }
+uint64_t time_now(void) {
+  uint64_t base;
+  uint32_t value;
+
+  // Retry if SysTick_Handler ran between reading `now` and the counter.
+  do {
+    base = now;
+    value = SysTick->VAL;
+  } while (base != now);
+
+  return base + calib - value;
+}
 
 uint64_t usecs(uint64_t s) { return s * calib / 1000; }
 uint64_t msecs(uint64_t s) { return s * calib; }

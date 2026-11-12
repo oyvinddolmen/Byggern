@@ -32,8 +32,6 @@ void send_game_over(void) {
 }
 
 void check_game_over(uint16_t adc_value) {
-  printf("ADC Value: %u\n", adc_value);
-
   if (!beam_blocked && adc_value < 500) {
     send_game_over();
     beam_blocked = true;

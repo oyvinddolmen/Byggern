@@ -74,12 +74,10 @@ uint32_t joystickpos_to_pulse(uint8_t pos) {
   if (pos > 100u) {
     pos = 100u;
   }
-  printf("%u\n", (uint32_t)pos);
   return 900u + (uint32_t)pos * 12u;
 }
 
 void pwm_pulse_from_controller(CanMsg *message) {
-  uint8_t xpos = message->byte[0];
   uint8_t ypos = message->byte[1];
 
   // Y-axis controls the servo.

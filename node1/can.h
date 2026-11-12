@@ -8,7 +8,7 @@
 #define CAN_MAX_DATA_SIZE 8
 
 typedef struct {
-  uint8_t id;
+  uint16_t id; // 11-bit standard identifier
   uint8_t length;
   uint8_t data[CAN_MAX_DATA_SIZE];
 } CanMessage;

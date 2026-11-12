@@ -1,6 +1,11 @@
+#ifndef OLED_H
+#define OLED_H
+
 #include <avr/io.h>
 #include <stdio.h>
+#ifndef F_CPU
 #define F_CPU 4915200UL // processor speed 4.915 MHz
+#endif
 #include <util/delay.h>
 
 void oled_init();
@@ -15,3 +20,5 @@ void oled_clear();
 void oled_pos(uint8_t row, uint8_t column);
 void oled_write_char(char c);
 void oled_print(const char *text);
+
+#endif
