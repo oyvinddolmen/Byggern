@@ -1,16 +1,16 @@
 #ifndef CAN_H
 #define CAN_H
 
+#include "cancontroller.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "cancontroller.h"
 
 #define CAN_MAX_DATA_SIZE 8
 
 typedef struct {
-    uint8_t id;  
-    uint8_t length;
-    uint8_t data[CAN_MAX_DATA_SIZE];
+  uint8_t id;
+  uint8_t length;
+  uint8_t data[CAN_MAX_DATA_SIZE];
 } CanMessage;
 
 bool can_init(void);

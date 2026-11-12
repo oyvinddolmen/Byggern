@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <stdio.h>
-#define F_CPU 4915200UL		// processor speed 4.915 MHz
+#define F_CPU 4915200UL // processor speed 4.915 MHz
 #include <util/delay.h>
 
 void oled_init();

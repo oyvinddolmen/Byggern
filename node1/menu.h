@@ -1,35 +1,31 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
-typedef enum {
-    MENU_ACTION,
-    MENU_SUBMENU,
-    MENU_BACK
-} MenuItemType;
+typedef enum { MENU_ACTION, MENU_SUBMENU, MENU_BACK } MenuItemType;
 
 typedef struct Menu Menu;
 
 typedef struct {
-    const char *name;
-    MenuItemType type;
+  const char *name;
+  MenuItemType type;
 
-    union {
-        void (*action)(void);
-        Menu *submenu;
-    };
+  union {
+    void (*action)(void);
+    Menu *submenu;
+  };
 } MenuItem;
 
 struct Menu {
-    const char *title;
-    MenuItem *items;
-    uint8_t item_count;
-    Menu *parent;
+  const char *title;
+  MenuItem *items;
+  uint8_t item_count;
+  Menu *parent;
 };
 
-// Menus defined in menu.c 
+// Menus defined in menu.c
 extern Menu main_menu;
 extern Menu difficulty_menu;
 
@@ -50,7 +46,7 @@ bool menu_game_running(void);
 bool menu_game_finished(void);
 uint32_t menu_game_seconds(void);
 
-// Menu actions 
+// Menu actions
 void set_easy(void);
 void set_hard(void);
 

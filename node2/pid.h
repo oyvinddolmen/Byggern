@@ -2,10 +2,10 @@
 #define PID_H
 
 typedef struct {
-    float kp, ki, kd;
-    float integral;
-    float previous_error;
-    float dt; // Time step in seconds
+  float kp, ki, kd;
+  float integral;
+  float previous_error;
+  float dt; // Time step in seconds
 } PID;
 
 void pid_reset(void);

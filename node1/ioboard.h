@@ -1,56 +1,45 @@
 #ifndef IOBOARD_H
 #define IOBOARD_H
 
+#include "spi.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "spi.h"
 
 typedef struct {
-    bool LEFT;
-    bool RIGHT;
-    bool UP;
-    bool DOWN;
+  bool LEFT;
+  bool RIGHT;
+  bool UP;
+  bool DOWN;
 } JoystickDirections;
 
 typedef struct {
-    uint8_t x;
-    uint8_t y;
+  uint8_t x;
+  uint8_t y;
 } Position;
 
 typedef enum {
-    X_joystick = 0,
-    Y_joystick = 1,
-    X_touch = 2,
-    Y_touch = 3
+  X_joystick = 0,
+  Y_joystick = 1,
+  X_touch = 2,
+  Y_touch = 3
 } Variable;
 
-typedef enum {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    SELECT,
-    JOYSTICK_NONE
-} JoystickInput;
+typedef enum { UP, DOWN, LEFT, RIGHT, SELECT, JOYSTICK_NONE } JoystickInput;
 
 typedef struct {
-    uint8_t x;
-    uint8_t y;
-    uint8_t btn;
+  uint8_t x;
+  uint8_t y;
+  uint8_t btn;
 } JoystickData;
 
 typedef struct {
-    bool right;
-    bool left;
-    uint8_t number;
+  bool right;
+  bool left;
+  uint8_t number;
 } Button;
 
-typedef enum {
-    PRESSED = 1,
-    BTN_NONE = 0
-} ButtonState;
-
+typedef enum { PRESSED = 1, BTN_NONE = 0 } ButtonState;
 
 void ioboard_init(void);
 

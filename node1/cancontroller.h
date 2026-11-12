@@ -1,16 +1,16 @@
 #ifndef CANCONTROLLER_H
 #define CANCONTROLLER_H
 
-#include <stdint.h>
 #include "spi.h"
+#include <stdint.h>
 
 typedef enum {
-	CAN_CMD_READ = 0x03,
-	CAN_CMD_WRITE = 0x02,
-	CAN_CMD_REQUEST_TO_SEND = 0x80,
-	CAN_CMD_READ_STATUS = 0xA0,
-	CAN_CMD_BIT_MODIFY = 0x05,
-	CAN_CMD_RESET = 0xC0
+  CAN_CMD_READ = 0x03,
+  CAN_CMD_WRITE = 0x02,
+  CAN_CMD_REQUEST_TO_SEND = 0x80,
+  CAN_CMD_READ_STATUS = 0xA0,
+  CAN_CMD_BIT_MODIFY = 0x05,
+  CAN_CMD_RESET = 0xC0
 } CanCommand;
 
 void can_read(uint8_t address, uint8_t *data, uint8_t length);
