@@ -31,8 +31,7 @@
  *
  */
 /*
- * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip
- * Support</a>
+ * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
 #ifndef UTILS_INTERRUPT_H
 #define UTILS_INTERRUPT_H
@@ -40,13 +39,13 @@
 #include <parts.h>
 
 #if XMEGA || MEGA
-#include "interrupt/interrupt_avr8.h"
+#  include "interrupt/interrupt_avr8.h"
 #elif UC3
-#include "interrupt/interrupt_avr32.h"
+#  include "interrupt/interrupt_avr32.h"
 #elif SAM || SAMB
-#include "interrupt/interrupt_sam_nvic.h"
+#  include "interrupt/interrupt_sam_nvic.h"
 #else
-#error Unsupported device.
+#  error Unsupported device.
 #endif
 
 /**
@@ -62,11 +61,11 @@
  * \def CONFIG_INTERRUPT_FORCE_INTC
  * \brief Force usage of the ASF INTC driver
  *
- * Predefine this symbol when preprocessing to force the use of the ASF INTC
- * driver. This is useful to ensure compatibility across compilers and shall be
- * used only when required by the application needs.
+ * Predefine this symbol when preprocessing to force the use of the ASF INTC driver.
+ * This is useful to ensure compatibility across compilers and shall be used only when required
+ * by the application needs.
  */
-#define CONFIG_INTERRUPT_FORCE_INTC
+#  define CONFIG_INTERRUPT_FORCE_INTC
 #endif
 
 //! \name Global interrupt flags

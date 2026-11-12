@@ -29,8 +29,7 @@
  *
  */
 /*
- * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip
- * Support</a>
+ * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
 
 #ifndef _SAM3XA_RTT_INSTANCE_
@@ -38,17 +37,15 @@
 
 /* ========== Register definition for RTT peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_RTT_MR (0x400E1A30U) /**< \brief (RTT) Mode Register */
-#define REG_RTT_AR (0x400E1A34U) /**< \brief (RTT) Alarm Register */
-#define REG_RTT_VR (0x400E1A38U) /**< \brief (RTT) Value Register */
-#define REG_RTT_SR (0x400E1A3CU) /**< \brief (RTT) Status Register */
+#define REG_RTT_MR          (0x400E1A30U) /**< \brief (RTT) Mode Register */
+#define REG_RTT_AR          (0x400E1A34U) /**< \brief (RTT) Alarm Register */
+#define REG_RTT_VR          (0x400E1A38U) /**< \brief (RTT) Value Register */
+#define REG_RTT_SR          (0x400E1A3CU) /**< \brief (RTT) Status Register */
 #else
-#define REG_RTT_MR (*(RwReg *)0x400E1A30U) /**< \brief (RTT) Mode Register */
-#define REG_RTT_AR (*(RwReg *)0x400E1A34U) /**< \brief (RTT) Alarm Register */
-#define REG_RTT_VR (*(RoReg *)0x400E1A38U) /**< \brief (RTT) Value Register */
-#define REG_RTT_SR                                                             \
-  (*(RoReg *)0x400E1A3CU) /**< \brief (RTT) Status Register                    \
-                           */
+#define REG_RTT_MR (*(RwReg*)0x400E1A30U) /**< \brief (RTT) Mode Register */
+#define REG_RTT_AR (*(RwReg*)0x400E1A34U) /**< \brief (RTT) Alarm Register */
+#define REG_RTT_VR (*(RoReg*)0x400E1A38U) /**< \brief (RTT) Value Register */
+#define REG_RTT_SR (*(RoReg*)0x400E1A3CU) /**< \brief (RTT) Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #endif /* _SAM3XA_RTT_INSTANCE_ */

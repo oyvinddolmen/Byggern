@@ -33,8 +33,7 @@
  *
  */
 /*
- * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip
- * Support</a>
+ * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
 
 #ifndef _SAM_IO_
@@ -44,105 +43,105 @@
 
 /* SAM3S series */
 #if (SAM3S)
-#if (SAM3S8 || SAM3SD8)
-#include "sam3s8.h"
-#else
-#include "sam3s.h"
-#endif
+# if (SAM3S8 || SAM3SD8)
+#  include "sam3s8.h"
+# else
+#  include "sam3s.h"
+# endif
 #endif
 
 /* SAM3U series */
 #if (SAM3U)
-#include "sam3u.h"
+#  include "sam3u.h"
 #endif
 
 /* SAM3N series */
 #if (SAM3N)
-#include "sam3n.h"
+#  include "sam3n.h"
 #endif
 
 /* SAM3XA series */
 #if (SAM3XA)
-#include "sam3xa.h"
+#  include "sam3xa.h"
 #endif
 
 /* SAM4S series */
 #if (SAM4S)
-#include "sam4s.h"
+#  include "sam4s.h"
 #endif
 
 /* SAM4L series */
 #if (SAM4L)
-#include "sam4l.h"
+#  include "sam4l.h"
 #endif
 
 /* SAM4E series */
 #if (SAM4E)
-#include "sam4e.h"
+#  include "sam4e.h"
 #endif
 
 /* SAM4N series */
 #if (SAM4N)
-#include "sam4n.h"
+#  include "sam4n.h"
 #endif
 
 /* SAM4C series */
 #if (SAM4C)
-#include "sam4c.h"
+#  include "sam4c.h"
 #endif
 
 /* SAM4CM series */
 #if (SAM4CM)
-#if (SAM4CMP32 || SAM4CMS32)
-#include "sam4cm32.h"
-#else
-#include "sam4cm.h"
-#endif
+#  if (SAM4CMP32 || SAM4CMS32)
+#    include "sam4cm32.h"
+#  else
+#    include "sam4cm.h"
+#  endif
 #endif
 
 /* SAM4CP series */
 #if (SAM4CP)
-#include "sam4cp.h"
+#  include "sam4cp.h"
 #endif
 
 /* SAMG51 series */
 #if (SAMG51)
-#include "samg51.h"
+#  include "samg51.h"
 #endif
 
 /* SAMG53 series */
 #if (SAMG53)
-#include "samg53.h"
+#  include "samg53.h"
 #endif
 
 /* SAMG54 series */
 #if (SAMG54)
-#include "samg54.h"
+#  include "samg54.h"
 #endif
 
 /* SAMG55 series */
 #if (SAMG55)
-#include "samg55.h"
+#  include "samg55.h"
 #endif
 
 /* SAMV71 series */
 #if (SAMV71)
-#include "samv71.h"
+#  include "samv71.h"
 #endif
 
 /* SAMV70 series */
 #if (SAMV70)
-#include "samv70.h"
+#  include "samv70.h"
 #endif
 
 /* SAME70 series */
 #if (SAME70)
-#include "same70.h"
+#  include "same70.h"
 #endif
 
 /* SAMS70 series */
 #if (SAMS70)
-#include "sams70.h"
+#  include "sams70.h"
 #endif
 
 #endif /* _SAM_IO_ */

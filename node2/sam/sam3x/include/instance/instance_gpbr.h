@@ -29,8 +29,7 @@
  *
  */
 /*
- * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip
- * Support</a>
+ * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
 
 #ifndef _SAM3XA_GPBR_INSTANCE_
@@ -38,12 +37,9 @@
 
 /* ========== Register definition for GPBR peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_GPBR_GPBR                                                          \
-  (0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
+#define REG_GPBR_GPBR            (0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
 #else
-#define REG_GPBR_GPBR                                                          \
-  (*(RwReg *)0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register   \
-                           */
+#define REG_GPBR_GPBR   (*(RwReg*)0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #endif /* _SAM3XA_GPBR_INSTANCE_ */

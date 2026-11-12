@@ -31,15 +31,15 @@
  *
  */
 /*
- * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip
- * Support</a>
+ * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
 
 #ifndef _PREPROCESSOR_H_
 #define _PREPROCESSOR_H_
 
-#include "mrepeat.h"
-#include "stringz.h"
 #include "tpaste.h"
+#include "stringz.h"
+#include "mrepeat.h"
 
-#endif // _PREPROCESSOR_H_
+
+#endif  // _PREPROCESSOR_H_
