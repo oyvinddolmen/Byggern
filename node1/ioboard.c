@@ -4,6 +4,12 @@
 #include "ioboard.h"
 #include <util/delay.h>
 
+
+// AI declaration:
+// In this file AI is used for syntax and creating suitable datatypes.
+// The logic behind is ours
+
+
 // Dead zone measured in ADC counts
 #define JOYSTICK_DEADZONE 20
 

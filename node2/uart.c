@@ -1,6 +1,8 @@
 #include "sam.h"
 #include <stdio.h>
 
+// this code is a handout 
+
 #define F_CPU 84000000
 
 typedef struct RingBuf RingBuf;
@@ -66,6 +68,7 @@ void uart_tx(uint8_t val) {
 
 uint8_t uart_rx(uint8_t *val) { return pop(&ringBuf, val); }
 
+// made with help of AI
 int uart_flush(char *buf, int len) {
   int r = 0;
   for (; r < len; r++) {
@@ -94,7 +97,6 @@ void UART_Handler() {
   }
 }
 
-// See https://interrupt.memfault.com/blog/boostrapping-libc-with-newlib
 
 extern int _end;
 #include <sys/stat.h>

@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// made with help of AI
 #define MOTOR_CHANNEL 0u
 #define MOTOR_CHANNEL_MASK (1u << MOTOR_CHANNEL)
 #define MOTOR_ENABLE_PIN (1u << 12) /* PB12, PWMH0 */
@@ -16,6 +17,7 @@
 #define MOTOR_DEADZONE 5
 #define MOTOR_REVERSE 0 /* Set to 1 to reverse joystick direction. */
 
+// init made with help of AI
 void motor_init(void) {
   PMC->PMC_PCER0 = (1u << ID_PIOB) | (1u << ID_PIOC);
   PMC->PMC_PCER1 = (1u << (ID_PWM - 32u));

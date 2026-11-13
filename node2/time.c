@@ -6,6 +6,7 @@
 uint64_t calib;
 static volatile uint64_t now = 0;
 
+// made with help of AI
 __attribute__((constructor)) void time_init(void) {
   // Clock calibration is set to '(num cycles for 1ms) / 8'
   // (SysTick is by default set to use 8x clock divisor)
@@ -39,6 +40,7 @@ uint64_t time_now(void) {
   return base + calib - value;
 }
 
+// made with help of AI
 uint64_t usecs(uint64_t s) { return s * calib / 1000; }
 uint64_t msecs(uint64_t s) { return s * calib; }
 uint64_t seconds(uint64_t s) { return s * 1000 * calib; }

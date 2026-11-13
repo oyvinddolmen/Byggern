@@ -10,6 +10,7 @@
 static volatile uint32_t elapsed_seconds;
 
 /* Timer1 counts seconds; Timer3 remains the ADC clock. */
+// timers made with help of AI
 void game_timer_init(void) {
   TCCR1B = 0;
   TCCR1A = 0;
@@ -38,6 +39,7 @@ uint32_t game_timer_seconds(void) {
 }
 
 // klokkesignal for ADCen
+// init function made with help of AI
 void clock_init(void) {
   DDRD |= (1 << PD4); // PD4/OC3A as output
 

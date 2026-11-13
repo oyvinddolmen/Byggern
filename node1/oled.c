@@ -2,6 +2,8 @@
 #include "fonts.h"
 #include "spi.h"
 
+// oled_init is made with help of AI
+// It was used to find registers and ordering
 void oled_init(void) {
   // fra
   oled_write_command(0xae); // display off
@@ -98,6 +100,7 @@ void oled_pos(uint8_t row, uint8_t column) {
   oled_goto_column(column);
 }
 
+// the logic of writing to the oled is made with help of AI
 void oled_write_char(char c) {
   // Font table contains printable ASCII characters: ASCII to ASCII 126
   if (c < 32 || c > 126) {

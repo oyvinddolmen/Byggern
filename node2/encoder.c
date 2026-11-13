@@ -1,6 +1,7 @@
 #include "encoder.h"
 #include "sam.h"
 
+// made with help of AI
 void encoder_init(void) {
   /*
    * Enable the peripheral clock for PIOC.

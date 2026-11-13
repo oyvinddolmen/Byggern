@@ -1,5 +1,6 @@
 #include "spi.h"
 
+// SPI init is made with help of AI
 void spi_init(void) {
   /* Inactive CS/reset before enabling outputs. */
   PORTB |= (1 << PB4) | (1 << PB1) | (1 << PB0) | (1 << PB2);

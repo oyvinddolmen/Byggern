@@ -2,6 +2,8 @@
 #include "clock.h"
 #include <stddef.h>
 
+// AI is used to define suitable data types for displaying the menu
+
 Menu main_menu;
 Menu difficulty_menu;
 

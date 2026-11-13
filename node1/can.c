@@ -6,6 +6,7 @@
 #include <string.h>
 #include <util/delay.h>
 
+// Made in collaberation with AI which helped us read datasheets for registrers
 #define MCP_CANSTAT 0x0E  // can status
 #define MCP_CANCTRL 0x0F  // can control
 #define MCP_CNF3 0x28     // can bit timing
@@ -81,7 +82,7 @@ bool can_send(const CanMessage *message) {
     return false; // Buffer busy
   }
 
-  // gjør om message til bytes-arrayet MCP2515 bruker
+  // gjør om message til bytes-arrayet MCP2515 bruker (done with help of AI)
   uint8_t bytes[13] = {0};
   bytes[0] = message->id >> 3;
   bytes[1] = (message->id & 0x07) << 5;
@@ -97,6 +98,7 @@ bool can_send(const CanMessage *message) {
 
 // sjekk om MCP2515 har mottatt melding -> les melding fra RX buffer -> tolk
 // melding -> lagre i *message
+// made with help of AI
 bool can_receive(CanMessage *message) {
   if (message == NULL)
     return false;

@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+// init function made with help of AI
 void uart_init(unsigned int ubrr) {
   // setter BAUD rate
   // lagre de 8 første bits i UBRR0High registeret. 8 siste i LOW

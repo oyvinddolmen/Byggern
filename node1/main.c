@@ -7,7 +7,6 @@
 #include "oled.h"
 #include "run.h"
 #include "spi.h"
-#include "sram_test.h"
 #include "uart.h"
 #include <avr/io.h>
 #include <util/delay.h>

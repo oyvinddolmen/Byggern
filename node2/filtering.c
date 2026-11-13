@@ -2,6 +2,8 @@
 
 static float time_constant = 0.1f; // Time constant for the low-pass filter
 
+// lowpass filter made with help of AI
+
 uint16_t adc_lowpass(uint16_t sample) {
   static float filtered;
   static uint8_t initialized = 0;

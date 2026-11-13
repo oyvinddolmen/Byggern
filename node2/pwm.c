@@ -3,6 +3,7 @@
 #include "sam.h"
 
 /*
+// this comment is received from AI
  * Registers used:
  * PMC_PCER0   : Enable the PIOB clock, bit 12.
  * PMC_PCER1   : Enable the PWM clock, bit 4 (peripheral ID 36).
@@ -23,7 +24,7 @@
 #define SERVO_PIN_MASK (1u << 13)
 
 /* ------------------ SERVO --------------------- */
-
+// made with help of AI
 void pwm_init(void) {
   // 1. Enable the peripheral clocks for PIOB and PWM.
   PWM->PWM_CLK = PWM_CLK_PREA(0) | PWM_CLK_DIVA(84);

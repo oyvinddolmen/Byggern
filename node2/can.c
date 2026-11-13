@@ -5,6 +5,7 @@
 #define txMailbox 0
 #define rxMailbox 1
 
+// for loop made with help of AI
 void can_printmsg(CanMsg m) {
   uint8_t length = m.length > 8 ? 8 : m.length;
 
@@ -20,6 +21,7 @@ void can_printmsg(CanMsg m) {
   printf("})\n");
 }
 
+// made with help of AI
 void can_init(CanInit init, uint8_t rxInterrupt) {
   // Enable the PIOA and CAN0 peripheral clocks.
   PMC->PMC_PCER0 = (1u << ID_PIOA);
@@ -62,6 +64,7 @@ void can_init(CanInit init, uint8_t rxInterrupt) {
   CAN0->CAN_MR |= CAN_MR_CANEN;
 }
 
+// made with helo of AI
 void can_tx(CanMsg m) {
   // Blocking: wait until the transmit mailbox is available.
   while (!(CAN0->CAN_MB[txMailbox].CAN_MSR & CAN_MSR_MRDY)) {
@@ -81,6 +84,7 @@ void can_tx(CanMsg m) {
       ((uint32_t)m.length << CAN_MCR_MDLC_Pos) | CAN_MCR_MTCR;
 }
 
+// made with help of AI
 uint8_t can_rx(CanMsg *m) {
   if (m == NULL) {
     return 0;
