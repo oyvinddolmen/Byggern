@@ -81,5 +81,6 @@ void pwm_pulse_from_controller(CanMsg *message) {
   uint8_t ypos = message->byte[1];
 
   // Y-axis controls the servo.
+  printf("Y position: %u\n", (unsigned int)ypos);
   pwm_set_pulse_us(joystickpos_to_pulse(ypos));
 }

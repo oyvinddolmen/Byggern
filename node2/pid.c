@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 PID pid = {.kp = 1.5f,
-           .ki = 5.0f,
+           .ki = 2.0f,
            .kd = 0.0f,
            .integral = 0.0f,
            .previous_error = 0.0f,

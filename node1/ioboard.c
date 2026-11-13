@@ -5,7 +5,7 @@
 #include <util/delay.h>
 
 // Dead zone measured in ADC counts
-#define JOYSTICK_DEADZONE 12
+#define JOYSTICK_DEADZONE 20
 
 typedef struct {
   uint8_t min;
